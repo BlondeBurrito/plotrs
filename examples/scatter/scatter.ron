@@ -1,0 +1,7 @@
+Scatter(
+	title: "Engery against Time for Leptic Quarks-Baby!",
+	canvas_pixel_size: (800, 600),
+	x_axis_label: "Time",
+	y_axis_label: "Energy",
+	data_path: "scatter.csv"
+)
