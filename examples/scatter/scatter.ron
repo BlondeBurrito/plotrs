@@ -1,7 +1,20 @@
 Scatter(
 	title: "Engery against Time for Leptic Quarks-Baby!",
 	canvas_pixel_size: (800, 600),
-	x_axis_label: "Time",
-	y_axis_label: "Energy",
-	data_path: "scatter.csv"
+	x_axis_label: "Time (ms)",
+	y_axis_label: "Energy (kJ)",
+	data_sets: [
+		DataSet(
+			data_path: "scatter.csv",
+			has_headers: true, // if your data has headers set to `true` so they can be ignored
+			x_axis_csv_column: 0, // which column contains the x values
+			x_axis_error_bar_csv_column: None, // which column contains x uncertainty Some(usize) or None
+			y_axis_csv_column: 1, // which column contains the  values
+			y_axis_error_bar_csv_column: None, // which column contains y uncertainty Some(usize) or None
+			name: "Very interesting", // if generating a legend will indicate which colour correspond to which data set
+			colour: Orange, // the colour to render a data point
+			symbol: Cross, // the shape a plotted data point should take
+		),
+	],
+	has_legend: false // should a legend be generated? Only really useful with multiple data sets
 )
