@@ -1,28 +1,50 @@
 //!
 
-use crate::colours::*;
-use image::{ImageBuffer, Rgba, RgbaImage};
+use crate::{colours::*, get_system_font};
+use image::{DynamicImage, GenericImage, ImageBuffer, Rgba, RgbaImage};
 use regex::Regex;
 use rusttype::{point, Font, PositionedGlyph, Scale};
-use tracing::{error, info, warn};
+use serde::Deserialize;
+use tracing::{debug, error, info, warn};
 
-pub struct CanvasElements {
-	title_font_size: f32,
+/// Font sizes for the different elements of a graph
+pub struct FontSizes {
+	pub title_font_size: f32,
+	pub axis_font_size: f32,
 }
 
-impl CanvasElements {
-	pub fn new(canvas_pixel_size: &(u32, u32)) -> CanvasElements {
-
-		CanvasElements { title_font_size: 33.0 }
+impl FontSizes {
+	/// Based on the golden ratio and canvas width generate appropriate font sizes
+	pub fn new(canvas_pixel_size: &(u32, u32)) -> FontSizes {
+		// using the golden ratio and canvas width calculate the title font size
+		let gr = (1.0 + 5.0_f32.sqrt()) / 2.0;
+		// line height is the root of canvas wdith
+		let line_height = (canvas_pixel_size.0 as f32).sqrt();
+		// font size is line height divided by the ratio
+		let title_font_size = line_height / gr;
+		debug!("Calculated title font size to be {}", title_font_size);
+		// axis font size is based on a reduction of title size
+		let axis_font_size = title_font_size / 2.0;
+		debug!("Calculated x-axis font size to be {}", axis_font_size);
+		FontSizes {
+			title_font_size: title_font_size,
+			axis_font_size: axis_font_size,
+		}
 	}
+}
+/// The shape a plotted data point should take
+#[derive(Debug, Deserialize)]
+pub enum DataSymbol {
+	Cross,
+	Circle,
+	Triangle,
+	Square,
 }
 
 /// Create a blank canvas which can be mutated with content
 pub fn draw_base_canvas(canvas_pixel_size: (u32, u32)) -> ImageBuffer<Rgba<u8>, Vec<u8>> {
 	// create a new image buffer based on `canvas_pixel_size`
 	let mut imgbuf = RgbaImage::new(canvas_pixel_size.0, canvas_pixel_size.1);
-
-	// let e = DynamicImage::new_rgba8(00, 800).to_rgba8();
 
 	// set all pixels to white
 	for pixel in imgbuf.pixels_mut() {
@@ -31,7 +53,7 @@ pub fn draw_base_canvas(canvas_pixel_size: (u32, u32)) -> ImageBuffer<Rgba<u8>, 
 	return imgbuf;
 }
 
-/// Creates a vector go gyphs
+/// Creates a vector of gyphs running left to right
 pub fn create_glyphs<'a>(
 	font_size: f32,
 	text: &'a str,
@@ -64,15 +86,15 @@ pub fn draw_glyphs(
 				let py = y + position.1 + bounding_box.min.y as u32;
 				match canvas.get_pixel_mut_checked(px, py) {
 					Some(pixel) => *pixel = Rgba([r, g, b, a]),
-					None => warn!("Cannot draw text outside of canvas at ({}, {}), shorter title/labels required", px, py),
+					None => warn!("Cannot draw text outside of canvas at ({}, {}), shorter title/labels required or increase the canvas size", px, py),
 				}
 			});
 		}
 	}
-	// drawing glyphs creates pixel with an alpha channel of 0
+	// drawing glyphs creates a pixel with an alpha channel of 0 surrounding its edges,
 	// these indicate the empty space around a character and we fill them in with white background pixels
 	for pixel in canvas.pixels_mut() {
-		if pixel.0[3] < 1 {
+		if pixel.0[3] == 0 {
 			*pixel = Rgba(WHITE);
 		}
 	}
@@ -86,12 +108,157 @@ pub fn save_image(imgbuf: ImageBuffer<Rgba<u8>, Vec<u8>>, output_path: &str, tit
 	info!("Saving image to {}", output);
 	match imgbuf.save(output) {
 		Ok(_) => {
-			info!("Output saved");
+			info!("Image saved");
 			std::process::exit(0);
 		}
 		Err(e) => {
-			error!("Unable to save output: {:?}", e);
+			error!("Unable to save image: {:?}", e);
 			std::process::exit(1);
 		}
 	}
+}
+
+/// Draws the y-axis label onto the canvas
+pub fn build_y_axis_label(
+	canvas: &mut ImageBuffer<Rgba<u8>, Vec<u8>>,
+	label: String,
+	font_size: f32,
+) {
+	let font = get_system_font();
+	let axis_glyphs: Vec<PositionedGlyph> = create_glyphs(font_size, label.as_str(), &font);
+	// as the glphs are drawn horizontally we draw them onto a new canvas where its width matches the main canvas' height
+	// we can then rotate this new canvas and copy it onto the main canvas so that the y-axis label appears vertical and aligned to the left
+	let mut rotated_canvas =
+		DynamicImage::new_rgba8(canvas.dimensions().1, canvas.dimensions().0).to_rgba8();
+	let offset = get_y_axis_label_offset(&axis_glyphs, rotated_canvas.dimensions().0, font_size);
+	draw_glyphs(&mut rotated_canvas, BLACK, axis_glyphs, offset);
+	// rotate the canvas so its dimensions are aligned to the main canvas
+	let aligned_canvas = DynamicImage::ImageRgba8(rotated_canvas).rotate270();
+	// copy the canvas containing the text onto the main canvas
+	match canvas.copy_from(&aligned_canvas, 0, 0) {
+		Ok(_) => (),
+		Err(e) => {
+			error!("Unable to draw y-axis label: {}", e);
+			std::process::exit(1);
+		}
+	}
+}
+/// Using glyph sizes calculate by how much the axis label should be offset from the origin
+fn get_y_axis_label_offset(
+	glyphs: &Vec<PositionedGlyph>,
+	canvas_width: u32,
+	font_size: f32,
+) -> (u32, u32) {
+	let mut text_width = 0;
+	let mut max_text_height = 0;
+	for g in glyphs {
+		match g.pixel_bounding_box() {
+			Some(x) => {
+				text_width += x.width();
+				if x.height() > max_text_height {
+					max_text_height = x.height()
+				}
+			}
+			None => {
+				// None indicates whitespace, assume whitespace width is same as font size
+				text_width += font_size as i32;
+			}
+		};
+	}
+	debug!("Y-axis label pixel width: {}", text_width);
+	debug!("Y-axis label max pixel height: {}", max_text_height);
+	let horizontal_position = (canvas_width / 2) - (text_width as u32);
+	debug!("Y-axis horizontal offset: {}", horizontal_position);
+	let vertical_postion = max_text_height as u32 * 2;
+	debug!("Y-axis vertical offset: {}", vertical_postion);
+	return (horizontal_position, vertical_postion);
+}
+
+/// Draws the x-axis label onto the canvas
+pub fn build_x_axis_label(
+	canvas: &mut ImageBuffer<Rgba<u8>, Vec<u8>>,
+	label: String,
+	font_size: f32,
+) {
+	let font = get_system_font();
+	let axis_glyphs: Vec<PositionedGlyph> = create_glyphs(font_size, label.as_str(), &font);
+	let offset = get_x_axis_label_offset(
+		&axis_glyphs,
+		canvas.dimensions().0,
+		canvas.dimensions().1,
+		font_size,
+	);
+	draw_glyphs(canvas, BLACK, axis_glyphs, offset);
+}
+
+/// Using glyph sizes calculate by how much the axis label should be offset from the origin
+fn get_x_axis_label_offset(
+	glyphs: &Vec<PositionedGlyph>,
+	canvas_width: u32,
+	canvas_height: u32,
+	font_size: f32,
+) -> (u32, u32) {
+	let mut text_width = 0;
+	let mut max_text_height = 0;
+	for g in glyphs {
+		match g.pixel_bounding_box() {
+			Some(x) => {
+				text_width += x.width();
+				if x.height() > max_text_height {
+					max_text_height = x.height()
+				}
+			}
+			None => {
+				// None indicates whitespace, assume whitespace width is same as font size
+				text_width += font_size as i32;
+			}
+		};
+	}
+	debug!("X-axis label pixel width: {}", text_width);
+	debug!("X-axis label max pixel height: {}", max_text_height);
+	let horizontal_position = (canvas_width / 2) - (text_width as u32);
+	debug!("X-axis horizontal offset: {}", horizontal_position);
+	//TODO: there must be a better way than using a scale factor of 6?
+	let vertical_postion = canvas_height - (max_text_height as u32 * 6);
+	debug!("X-axis vertical offset: {}", vertical_postion);
+	return (horizontal_position, vertical_postion);
+}
+
+/// Draws the title of the graph onto the canvas
+pub fn build_title(canvas: &mut ImageBuffer<Rgba<u8>, Vec<u8>>, title: &String, font_size: f32) {
+	let font = get_system_font();
+	let title_glyphs: Vec<PositionedGlyph> = create_glyphs(font_size, title.as_str(), &font);
+	let offset = get_title_offset(&title_glyphs, canvas.dimensions().0, font_size);
+	draw_glyphs(canvas, BLACK, title_glyphs, offset);
+}
+
+/// Using glyph sizes calculate by how much the axis label should be offset from the origin
+fn get_title_offset(
+	glyphs: &Vec<PositionedGlyph>,
+	canvas_width: u32,
+	font_size: f32,
+) -> (u32, u32) {
+	let mut text_width = 0;
+	let mut max_text_height = 0;
+	for g in glyphs {
+		match g.pixel_bounding_box() {
+			Some(x) => {
+				text_width += x.width();
+				if x.height() > max_text_height {
+					max_text_height = x.height()
+				}
+			}
+			None => {
+				// None indicates whitespace, assume whitespace width is same as font size
+				text_width += font_size as i32;
+			}
+		};
+	}
+	debug!("Title pixel width: {}", text_width);
+	debug!("Title max pixel height: {}", max_text_height);
+	let horizontal_position = (canvas_width / 2) - (text_width as u32 / 2);
+	debug!("Title horizontal offset: {}", horizontal_position);
+	let vertical_postion = max_text_height as u32 * 2;
+	debug!("Titlevertical offset: {}", vertical_postion);
+	return (horizontal_position, vertical_postion);
 }
