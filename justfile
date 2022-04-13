@@ -47,3 +47,10 @@ changelog TAG:
 doc-coverage:
   $env:RUSTDOCFLAGS="-Z unstable-options --show-coverage"
   cargo +nightly doc --workspace --all-features --no-deps
+
+install:
+  cargo install --path .
+
+generate-examples: install
+  cd examples/scatter/; plotit.exe -g scatter -c scatter.ron -o . -v
+  cd examples/scatter_large/; plotit.exe -g scatter -c scatter.ron -o . -v

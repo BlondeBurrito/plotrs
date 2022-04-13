@@ -1,6 +1,11 @@
+![linux](https://github.com/BlondeBurrito/plotit/actions/workflows/build_linux.yml/badge.svg)
+![windows](https://github.com/BlondeBurrito/plotit/actions/workflows/build_windows.yml/badge.svg)
+[![crates.io](https://img.shields.io/crates/v/pathfinding_astar.svg)](https://crates.io/crates/plotit)
+[![docs](https://img.shields.io/badge/docs-docs.rs-orange.svg)](https://docs.rs/plotit)
+
 # plotit
 
-A CLI for plotting data sets onto a variet of graphs.
+A CLI app for plotting data sets onto a variety of graphs.
 
 ## Install
 
@@ -20,6 +25,8 @@ E.g
 plotit -g scatter -c examples/scatter/scatter.ron -o examples/scatter
 ```
 
+Note that if your canvas is too small then your title and axis label test will become blurry.
+
 ## Examples
 
 Currently commented out, as I use clippy more I suspect to customise what it does.
@@ -28,4 +35,4 @@ Currently commented out, as I use clippy more I suspect to customise what it doe
 
 ## LICENSE
 
-[Dual license of MIT and Apache](https://github.com/BlondeBurrito/plotit/LICENSE).
+[Dual license of MIT and Apache](https://github.com/BlondeBurrito/plotit/blob/main/LICENSE).
