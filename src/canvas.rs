@@ -1,16 +1,19 @@
-//!
+//! Methods for drawing onto a canvas, generating glyphs and saving images
 
-use crate::{colours::*, get_system_font};
+use crate::{colours::*, get_system_font, scatter::DataPoint};
 use image::{DynamicImage, GenericImage, ImageBuffer, Rgba, RgbaImage};
 use regex::Regex;
 use rusttype::{point, Font, PositionedGlyph, Scale};
 use serde::Deserialize;
-use tracing::{debug, error, info, warn};
+use tracing::{debug, error, info, trace, warn};
+
+pub const TEXT_PIXEL_BUFFER: f32 = 20.0;
 
 /// Font sizes for the different elements of a graph
 pub struct FontSizes {
 	pub title_font_size: f32,
 	pub axis_font_size: f32,
+	pub axis_unit_font_size: f32,
 }
 
 impl FontSizes {
@@ -26,14 +29,17 @@ impl FontSizes {
 		// axis font size is based on a reduction of title size
 		let axis_font_size = title_font_size / 2.0;
 		debug!("Calculated x-axis font size to be {}", axis_font_size);
+		//TODO: is there a better wa of scaling axis unit size?
+		let axis_unit_font_size = axis_font_size * 0.75;
 		FontSizes {
 			title_font_size: title_font_size,
 			axis_font_size: axis_font_size,
+			axis_unit_font_size: axis_unit_font_size,
 		}
 	}
 }
 /// The shape a plotted data point should take
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Copy, Clone)]
 pub enum DataSymbol {
 	Cross,
 	Circle,
@@ -62,9 +68,13 @@ pub fn create_glyphs<'a>(
 	let scale = Scale::uniform(font_size);
 	let v_metrics = font.v_metrics(scale);
 
-	// layout the glyphs in a line with 20 pixels padding
-	font.layout(text, scale, point(20.0, 20.0 + v_metrics.ascent))
-		.collect()
+	// layout the glyphs in a line with TEXT_PIXEL_BUFFER pixels padding
+	font.layout(
+		text,
+		scale,
+		point(TEXT_PIXEL_BUFFER, TEXT_PIXEL_BUFFER + v_metrics.ascent),
+	)
+	.collect()
 }
 /// Draws glyphs onto the canvas at a given position
 pub fn draw_glyphs(
@@ -118,12 +128,12 @@ pub fn save_image(imgbuf: ImageBuffer<Rgba<u8>, Vec<u8>>, output_path: &str, tit
 	}
 }
 
-/// Draws the y-axis label onto the canvas
+/// Draws the y-axis label onto the canvas, returns how much horizontal space has been occupied
 pub fn build_y_axis_label(
 	canvas: &mut ImageBuffer<Rgba<u8>, Vec<u8>>,
 	label: String,
 	font_size: f32,
-) {
+) -> u32 {
 	let font = get_system_font();
 	let axis_glyphs: Vec<PositionedGlyph> = create_glyphs(font_size, label.as_str(), &font);
 	// as the glphs are drawn horizontally we draw them onto a new canvas where its width matches the main canvas' height
@@ -142,6 +152,8 @@ pub fn build_y_axis_label(
 			std::process::exit(1);
 		}
 	}
+	// return offset height as the rotated width offset
+	return offset.1;
 }
 /// Using glyph sizes calculate by how much the axis label should be offset from the origin
 fn get_y_axis_label_offset(
@@ -174,12 +186,12 @@ fn get_y_axis_label_offset(
 	return (horizontal_position, vertical_postion);
 }
 
-/// Draws the x-axis label onto the canvas
+/// Draws the x-axis label onto the canvas, returns the amount of vertical pixel space occupied from the bottom border
 pub fn build_x_axis_label(
 	canvas: &mut ImageBuffer<Rgba<u8>, Vec<u8>>,
 	label: String,
 	font_size: f32,
-) {
+) -> u32 {
 	let font = get_system_font();
 	let axis_glyphs: Vec<PositionedGlyph> = create_glyphs(font_size, label.as_str(), &font);
 	let offset = get_x_axis_label_offset(
@@ -189,6 +201,7 @@ pub fn build_x_axis_label(
 		font_size,
 	);
 	draw_glyphs(canvas, BLACK, axis_glyphs, offset);
+	return offset.1;
 }
 
 /// Using glyph sizes calculate by how much the axis label should be offset from the origin
@@ -224,12 +237,17 @@ fn get_x_axis_label_offset(
 	return (horizontal_position, vertical_postion);
 }
 
-/// Draws the title of the graph onto the canvas
-pub fn build_title(canvas: &mut ImageBuffer<Rgba<u8>, Vec<u8>>, title: &String, font_size: f32) {
+/// Draws the title of the graph onto the canvas, returns the amount of vertical pixel space occupied from the top border
+pub fn build_title(
+	canvas: &mut ImageBuffer<Rgba<u8>, Vec<u8>>,
+	title: &String,
+	font_size: f32,
+) -> u32 {
 	let font = get_system_font();
 	let title_glyphs: Vec<PositionedGlyph> = create_glyphs(font_size, title.as_str(), &font);
 	let offset = get_title_offset(&title_glyphs, canvas.dimensions().0, font_size);
 	draw_glyphs(canvas, BLACK, title_glyphs, offset);
+	return offset.1;
 }
 
 /// Using glyph sizes calculate by how much the axis label should be offset from the origin
@@ -259,6 +277,29 @@ fn get_title_offset(
 	let horizontal_position = (canvas_width / 2) - (text_width as u32 / 2);
 	debug!("Title horizontal offset: {}", horizontal_position);
 	let vertical_postion = max_text_height as u32 * 2;
-	debug!("Titlevertical offset: {}", vertical_postion);
+	debug!("Title vertical offset: {}", vertical_postion);
 	return (horizontal_position, vertical_postion);
+}
+/// Within the acceptable pixel space for the axes draw them, note the top left corner of the canvas is the origin `(0, 0)` with bottom right `(canvas.dimensions().0, canvas.dimensions().1)`
+pub fn draw_xy_axes(
+	canvas: &mut ImageBuffer<Rgba<u8>, Vec<u8>>,
+	origin_pixel: (u32, u32),
+	max_pixel: (u32, u32),
+) {
+	// x-axis
+	debug!("Drawing x-axis");
+	for px in origin_pixel.0..max_pixel.0 {
+		canvas.put_pixel(px, origin_pixel.1, Rgba(BLACK));
+	}
+	// y-axis
+	// max_pixel.1 is the smaller value located top left, we work drawing "down" to meet the axis origin
+	debug!("Drawing y-axis");
+	for py in max_pixel.1..origin_pixel.1 {
+		canvas.put_pixel(origin_pixel.0, py, Rgba(BLACK));
+	}
+}
+
+pub fn draw_point(point: DataPoint) {
+	trace!("Drawing point {:?}", point);
+	let rgba = Colour::get_pixel_colour(point.colour);
 }

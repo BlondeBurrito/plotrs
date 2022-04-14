@@ -11,7 +11,7 @@ pub const GREEN: [u8; 4] = [0, 0, 255, 255];
 pub const PINK: [u8; 4] = [255, 169, 208, 255];
 
 /// Colours that can be used to plot data points
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Copy, Clone)]
 pub enum Colour {
 	Orange,
 	Red,

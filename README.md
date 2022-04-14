@@ -1,7 +1,9 @@
 ![linux](https://github.com/BlondeBurrito/plotit/actions/workflows/build_linux.yml/badge.svg)
 ![windows](https://github.com/BlondeBurrito/plotit/actions/workflows/build_windows.yml/badge.svg)
-[![crates.io](https://img.shields.io/crates/v/pathfinding_astar.svg)](https://crates.io/crates/plotit)
+[![crates.io](https://img.shields.io/crates/v/plotit.svg)](https://crates.io/crates/plotit)
 [![docs](https://img.shields.io/badge/docs-docs.rs-orange.svg)](https://docs.rs/plotit)
+[![MIT/Apache 2.0](https://img.shields.io/badge/license-MIT%2FApache-blue.svg)](./LICENSE)
+[![Crates.io](https://img.shields.io/crates/d/plotit.svg)](https://crates.io/crates/plotit)
 
 # plotit
 

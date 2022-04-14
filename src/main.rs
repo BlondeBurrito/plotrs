@@ -19,13 +19,13 @@ mod scatter;
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
 struct Args {
-	/// Graph type to generate
+	/// Graph type to generate, accepted values: "scatter"
 	#[clap(short, long)]
 	graph: String,
 	/// Relative path to a .ron config file containing graph metadata
 	#[clap(short, long)]
 	config: String,
-	/// Relative path a directory where your png will be placed
+	/// Relative path to a directory where your png will be placed. Png names are based on our config graph title
 	#[clap(short, long, default_value_t = String::from("."))]
 	output: String,
 	/// Override the default csv delimiter "," with your own, e.g ";"
