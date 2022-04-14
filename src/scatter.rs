@@ -1,5 +1,6 @@
 //! Constructs a scatter graph
 
+use image::{ImageBuffer, Rgba};
 use ron::de::from_reader;
 use serde::Deserialize;
 use std::fs::File;
@@ -7,8 +8,8 @@ use tracing::{debug, error, info};
 
 use crate::{
 	canvas::{
-		build_title, build_x_axis_label, build_y_axis_label, draw_base_canvas, draw_point,
-		draw_xy_axes, save_image, DataSymbol, FontSizes, TEXT_PIXEL_BUFFER,
+		title::build_title, axes::build_x_axis_label, axes::build_y_axis_label, draw_base_canvas, plot::{DataPoint},
+		axes::draw_xy_axes, save_image, DataSymbol, glyphs::FontSizes, glyphs::TEXT_PIXEL_BUFFER,
 	},
 	colours::*,
 	data::load_data,
@@ -83,16 +84,22 @@ pub fn scatter_builder(path: &str, output: &str, csv_delimiter: &str) {
 	draw_xy_axes(&mut canvas, axis_min, axis_max);
 	// we need to know how the data scales to the length of axes for plotting,
 	// ie. we need a scale factor of how many units of data there is to one pixel
+	// first we need the axis length
 	let x_axis_length = axis_max.0 - axis_min.0;
 	let y_axis_length = axis_min.1 - axis_max.1;
 	debug!("X-axis length {}", x_axis_length);
 	debug!("Y-axis length {}", y_axis_length);
-	// min x-y and max x-y
+	// next we need to know the 'size' of our data, min x-y and max x-y
 	let bounds: ((u32, u32), (u32, u32)) = get_data_bounds(&scatter.data_sets, csv_delimiter);
+	debug!("Min and max data points: {:?}", bounds);
+	// now we can find the number of axis units per x and y
+	let x_axis_data_scale_factor: u32 = x_axis_length / (bounds.1.0 - bounds.0.0);
+	let y_axis_data_scale_factor: u32 = x_axis_length / (bounds.1.1 - bounds.0.1);
+	debug!("X-axis scale factor {}", x_axis_data_scale_factor);
+	debug!("Y-axis scale factor {}", y_axis_data_scale_factor);
 
-	// get the csv data content
-	build_data_points(&scatter.data_sets, csv_delimiter);
-	// let mut data = load_data(scatter.data_path, scatter.has_headers, csv_delimiter);
+	// get the csv data content and plot it
+	build_data_points(&scatter.data_sets, csv_delimiter, &mut canvas);
 
 	// save the resulting image
 	save_image(canvas, output, scatter.title);
@@ -127,10 +134,10 @@ impl Scatter {
 // Reads the supplied csv files and finds the minimum and maximum x and y values across all sets.
 // This faciliates drawing values on axes and finding the ratio of pixels to a data point for plotting
 fn get_data_bounds(data_set: &Vec<DataSet>, csv_delimiter: &str) -> ((u32, u32), (u32, u32)) {
-	let mut min_x = 0.0;
-	let mut min_ux = Some(0.0);
-	let mut min_y = 0.0;
-	let mut min_uy = Some(0.0);
+	let mut min_x = f32::MAX;
+	let mut min_ux = Some(f32::MAX);
+	let mut min_y = f32::MAX;
+	let mut min_uy = Some(f32::MAX);
 	let mut max_x = 0.0;
 	let mut max_ux = Some(0.0);
 	let mut max_y = 0.0;
@@ -147,14 +154,14 @@ fn get_data_bounds(data_set: &Vec<DataSet>, csv_delimiter: &str) -> ((u32, u32),
 					// x
 					match d.get(set.x_axis_csv_column) {
 						Some(string_value) => match string_value.parse::<f32>() {
-							// determine the smallest x value
+							// determine the smallest and highest x value
 							Ok(value) => {
-								if value < min_x {min_x = value}
-								if value > max_x {max_x = value}
+								if value < min_x {min_x = value;}
+								if value > max_x {max_x = value;}
 							},
 							Err(e) => {
 								error!(
-									"Could not parse data in column {}, row {}, error: {}",
+									"Could not parse data in column {}, row {} for x axis, error: {}",
 									set.x_axis_csv_column, row, e
 								);
 								std::process::exit(1);
@@ -162,7 +169,7 @@ fn get_data_bounds(data_set: &Vec<DataSet>, csv_delimiter: &str) -> ((u32, u32),
 						},
 						None => {
 							error!(
-								"Could not extract record in column {}, row {}",
+								"Could not extract record in column {} for x axis, row {}",
 								set.x_axis_csv_column, row
 							);
 							std::process::exit(1);
@@ -179,7 +186,7 @@ fn get_data_bounds(data_set: &Vec<DataSet>, csv_delimiter: &str) -> ((u32, u32),
 								},
 								Err(e) => {
 									error!(
-										"Could not parse data in column {}, row{}, to f32, error: {}",
+										"Could not parse data in column {}, row{}, to f32 for error bar x, error: {}",
 										set.x_axis_csv_column, row, e
 									);
 									std::process::exit(1);
@@ -187,7 +194,7 @@ fn get_data_bounds(data_set: &Vec<DataSet>, csv_delimiter: &str) -> ((u32, u32),
 							},
 							None => {
 								error!(
-									"Could not extract record in column {}, row {}",
+									"Could not extract record in column {} for error bar x, row {}",
 									set.x_axis_csv_column, row
 								);
 								std::process::exit(1);
@@ -205,7 +212,7 @@ fn get_data_bounds(data_set: &Vec<DataSet>, csv_delimiter: &str) -> ((u32, u32),
 							},
 							Err(e) => {
 								error!(
-									"Could not parse data in column {}, row {} to f32, error: {}",
+									"Could not parse data in column {}, row {} to f32 for y axis, error: {}",
 									set.x_axis_csv_column, row, e
 								);
 								std::process::exit(1);
@@ -213,7 +220,7 @@ fn get_data_bounds(data_set: &Vec<DataSet>, csv_delimiter: &str) -> ((u32, u32),
 						},
 						None => {
 							error!(
-								"Could not extract record in column {}, row {}",
+								"Could not extract record in column {} for y axis, row {}",
 								set.x_axis_csv_column, row
 							);
 							std::process::exit(1);
@@ -230,7 +237,7 @@ fn get_data_bounds(data_set: &Vec<DataSet>, csv_delimiter: &str) -> ((u32, u32),
 								},
 								Err(e) => {
 									error!(
-										"Could not parse data in column {}, row {} to f32, error: {}",
+										"Could not parse data in column {}, row {} to f32 for y error bar, error: {}",
 										set.x_axis_csv_column, row, e
 									);
 									std::process::exit(1);
@@ -238,7 +245,7 @@ fn get_data_bounds(data_set: &Vec<DataSet>, csv_delimiter: &str) -> ((u32, u32),
 							},
 							None => {
 								error!(
-									"Could not extract record in column {}, row {}",
+									"Could not extract record in column {}, row {} for y error bar",
 									set.x_axis_csv_column, row
 								);
 								std::process::exit(1);
@@ -257,8 +264,9 @@ fn get_data_bounds(data_set: &Vec<DataSet>, csv_delimiter: &str) -> ((u32, u32),
 	}
 	return ((min_x as u32, min_y as u32),(max_x as u32, max_y as u32))
 }
+
 /// Iterate through the data sets extracing the values from the csv and plot them
-fn build_data_points(data_set: &Vec<DataSet>, csv_delimiter: &str) {
+fn build_data_points(data_set: &Vec<DataSet>, csv_delimiter: &str, canvas: &mut ImageBuffer<Rgba<u8>, Vec<u8>>) {
 	// iterate over each set
 	for set in data_set.iter() {
 		// read the csv each set corresponds to
@@ -274,7 +282,7 @@ fn build_data_points(data_set: &Vec<DataSet>, csv_delimiter: &str) {
 							Ok(value) => value,
 							Err(e) => {
 								error!(
-									"Could not parse data in column {}, row {}, error: {}",
+									"Could not parse data in column {}, row {} for x axis, error: {}",
 									set.x_axis_csv_column, row, e
 								);
 								std::process::exit(1);
@@ -282,7 +290,7 @@ fn build_data_points(data_set: &Vec<DataSet>, csv_delimiter: &str) {
 						},
 						None => {
 							error!(
-								"Could not extract record in column {}, row {}",
+								"Could not extract record in column {}, row {} for x axis",
 								set.x_axis_csv_column, row
 							);
 							std::process::exit(1);
@@ -294,7 +302,7 @@ fn build_data_points(data_set: &Vec<DataSet>, csv_delimiter: &str) {
 								Ok(value) => Some(value),
 								Err(e) => {
 									error!(
-										"Could not parse data in column {}, row{}, to f32, error: {}",
+										"Could not parse data in column {}, row{}, to f32 for error bar x, error: {}",
 										set.x_axis_csv_column, row, e
 									);
 									std::process::exit(1);
@@ -302,7 +310,7 @@ fn build_data_points(data_set: &Vec<DataSet>, csv_delimiter: &str) {
 							},
 							None => {
 								error!(
-									"Could not extract record in column {}, row {}",
+									"Could not extract record in column {}, row {} for error bar x",
 									set.x_axis_csv_column, row
 								);
 								std::process::exit(1);
@@ -315,7 +323,7 @@ fn build_data_points(data_set: &Vec<DataSet>, csv_delimiter: &str) {
 							Ok(value) => value,
 							Err(e) => {
 								error!(
-									"Could not parse data in column {}, row {} to f32, error: {}",
+									"Could not parse data in column {}, row {} to f32 for y axis, error: {}",
 									set.x_axis_csv_column, row, e
 								);
 								std::process::exit(1);
@@ -323,7 +331,7 @@ fn build_data_points(data_set: &Vec<DataSet>, csv_delimiter: &str) {
 						},
 						None => {
 							error!(
-								"Could not extract record in column {}, row {}",
+								"Could not extract record in column {}, row {} for y axis",
 								set.x_axis_csv_column, row
 							);
 							std::process::exit(1);
@@ -335,7 +343,7 @@ fn build_data_points(data_set: &Vec<DataSet>, csv_delimiter: &str) {
 								Ok(value) => Some(value),
 								Err(e) => {
 									error!(
-										"Could not parse data in column {}, row {} to f32, error: {}",
+										"Could not parse data in column {}, row {} to f32 for y error bar, error: {}",
 										set.x_axis_csv_column, row, e
 									);
 									std::process::exit(1);
@@ -343,7 +351,7 @@ fn build_data_points(data_set: &Vec<DataSet>, csv_delimiter: &str) {
 							},
 							None => {
 								error!(
-									"Could not extract record in column {}, row {}",
+									"Could not extract record in column {}, row {} for y error bar",
 									set.x_axis_csv_column, row
 								);
 								std::process::exit(1);
@@ -360,7 +368,7 @@ fn build_data_points(data_set: &Vec<DataSet>, csv_delimiter: &str) {
 						colour: set.colour,
 						symbol: set.symbol,
 					};
-					draw_point(point);
+					point.draw_point(canvas);
 				}
 				Err(e) => {
 					error!("Cannot read csv record: {}", e);
@@ -372,19 +380,4 @@ fn build_data_points(data_set: &Vec<DataSet>, csv_delimiter: &str) {
 	}
 }
 
-/// Representation of a point of data point on a Scatter graph
-#[derive(Debug, Deserialize)]
-pub struct DataPoint {
-	/// An x data point
-	pub x: f32,
-	/// Uncertainty in x
-	pub ux: Option<f32>,
-	/// A  data point
-	pub y: f32,
-	/// Uncertainty in y
-	pub uy: Option<f32>,
-	/// The colour of the point
-	pub colour: Colour,
-	/// Symbol to represent point
-	pub symbol: DataSymbol,
-}
+

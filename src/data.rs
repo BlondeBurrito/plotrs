@@ -18,8 +18,9 @@ pub fn load_data(data_path: &str, has_headers: bool, csv_delimiter: &str) -> Rea
 			std::process::exit(1);
 		}
 	};
-	for record in data.records() {
-		trace!("Csv data: {:?}", record);
-	}
+	// let iter = data.records();
+	// for record in iter {
+	// 	trace!("Csv data: {:?}", record);
+	// }
 	return data;
 }
