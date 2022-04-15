@@ -8,13 +8,14 @@ use tracing::{debug, error, info};
 
 use crate::{
 	canvas::{
-		title::build_title, axes::build_x_axis_label, axes::build_y_axis_label, draw_base_canvas, plot::{DataPoint},
-		axes::draw_xy_axes, save_image, DataSymbol, glyphs::FontSizes, glyphs::TEXT_PIXEL_BUFFER,
+		axes::build_x_axis_label, axes::build_y_axis_label, axes::draw_xy_axes, draw_base_canvas,
+		glyphs::FontSizes, glyphs::TEXT_PIXEL_BUFFER, plot::DataPoint, save_image,
+		title::build_title, plot::DataSymbol,
 	},
 	colours::*,
 	data::load_data,
 };
-/// Specification of a scatter chart
+/// Specification of a scatter graph
 #[derive(Debug, Deserialize)]
 struct Scatter {
 	/// The title of the graph
@@ -30,7 +31,7 @@ struct Scatter {
 	/// Should a legend be generated
 	has_legend: bool,
 }
-/// The source of each data point and how it should be represented
+/// The source of each data set and how it should be represented
 #[derive(Debug, Deserialize)]
 struct DataSet {
 	/// Path to csv data
@@ -45,7 +46,7 @@ struct DataSet {
 	y_axis_csv_column: usize,
 	/// Optional, the csv column which contains an uncertainty measure
 	y_axis_error_bar_csv_column: Option<usize>,
-	/// Name of the x-axis data, useful when generating a legend to distinguish sets
+	/// Name of the data set, useful when generating a legend to distinguish sets
 	name: String,
 	/// The colour a data point should be plotted as
 	colour: Colour,
@@ -90,16 +91,20 @@ pub fn scatter_builder(path: &str, output: &str, csv_delimiter: &str) {
 	debug!("X-axis length {}", x_axis_length);
 	debug!("Y-axis length {}", y_axis_length);
 	// next we need to know the 'size' of our data, min x-y and max x-y
-	let bounds: ((u32, u32), (u32, u32)) = get_data_bounds(&scatter.data_sets, csv_delimiter);
+	let bounds: ((f32, f32), (f32, f32)) = get_data_bounds(&scatter.data_sets, csv_delimiter);
 	debug!("Min and max data points: {:?}", bounds);
+	// we want to create buffer space around our bounds so data points are not plotted directly on an axis
+	let bounds_with_buffer: ((u32, u32), (u32, u32)) = (((bounds.0.0 / 1.5) as u32, (bounds.0.1 / 1.5) as u32), ((bounds.1.0 * 1.2) as u32, (bounds.1.1 * 1.2) as u32));
+	debug!("Axes bounds {:?}", bounds_with_buffer);
 	// now we can find the number of axis units per x and y
-	let x_axis_data_scale_factor: u32 = x_axis_length / (bounds.1.0 - bounds.0.0);
-	let y_axis_data_scale_factor: u32 = x_axis_length / (bounds.1.1 - bounds.0.1);
+	//TODO: single row data set causes divide b zero
+	let x_axis_data_scale_factor: u32 = x_axis_length / (bounds_with_buffer.1.0 - bounds_with_buffer.0.0);
+	let y_axis_data_scale_factor: u32 = y_axis_length / (bounds_with_buffer.1.1 - bounds_with_buffer.0.1);
 	debug!("X-axis scale factor {}", x_axis_data_scale_factor);
 	debug!("Y-axis scale factor {}", y_axis_data_scale_factor);
 
 	// get the csv data content and plot it
-	build_data_points(&scatter.data_sets, csv_delimiter, &mut canvas);
+	build_data_points(&scatter.data_sets, csv_delimiter, &mut canvas, x_axis_data_scale_factor, y_axis_data_scale_factor,(axis_min.0, axis_max.1));
 
 	// save the resulting image
 	save_image(canvas, output, scatter.title);
@@ -133,7 +138,7 @@ impl Scatter {
 }
 // Reads the supplied csv files and finds the minimum and maximum x and y values across all sets.
 // This faciliates drawing values on axes and finding the ratio of pixels to a data point for plotting
-fn get_data_bounds(data_set: &Vec<DataSet>, csv_delimiter: &str) -> ((u32, u32), (u32, u32)) {
+fn get_data_bounds(data_set: &Vec<DataSet>, csv_delimiter: &str) -> ((f32, f32), (f32, f32)) {
 	let mut min_x = f32::MAX;
 	let mut min_ux = Some(f32::MAX);
 	let mut min_y = f32::MAX;
@@ -145,239 +150,244 @@ fn get_data_bounds(data_set: &Vec<DataSet>, csv_delimiter: &str) -> ((u32, u32),
 	// iterate over each set
 	for set in data_set.iter() {
 		// read the csv each set corresponds to
-		let mut data = load_data(set.data_path.as_str(), set.has_headers, csv_delimiter);
+		let data = load_data(set.data_path.as_str(), set.has_headers, csv_delimiter);
 		// used for error debuging
 		let mut row = 1;
-		for record in data.records() {
-			match record {
-				Ok(d) => {
-					// x
-					match d.get(set.x_axis_csv_column) {
-						Some(string_value) => match string_value.parse::<f32>() {
-							// determine the smallest and highest x value
-							Ok(value) => {
-								if value < min_x {min_x = value;}
-								if value > max_x {max_x = value;}
-							},
-							Err(e) => {
-								error!(
-									"Could not parse data in column {}, row {} for x axis, error: {}",
-									set.x_axis_csv_column, row, e
-								);
-								std::process::exit(1);
-							}
-						},
-						None => {
-							error!(
-								"Could not extract record in column {} for x axis, row {}",
-								set.x_axis_csv_column, row
-							);
-							std::process::exit(1);
+		for record in data.iter() {
+			// x
+			match record.get(set.x_axis_csv_column) {
+				Some(string_value) => match string_value.parse::<f32>() {
+					// determine the smallest and highest x value
+					Ok(value) => {
+						if value < min_x {
+							min_x = value;
 						}
-					};
-					// ux
-					match set.x_axis_error_bar_csv_column {
-						Some(column) => match d.get(column) {
-							Some(string_value) => match string_value.parse::<f32>() {
-								// determine the smallest uncertainty value in x
-								Ok(value) => {
-									if value < min_ux.unwrap() { min_ux = Some(value)}
-									if value > max_ux.unwrap() { max_ux = Some(value)}
-								},
-								Err(e) => {
-									error!(
+						if value > max_x {
+							max_x = value;
+						}
+					}
+					Err(e) => {
+						error!(
+							"Could not parse data in column {}, row {} for x axis, error: {}",
+							set.x_axis_csv_column, row, e
+						);
+						std::process::exit(1);
+					}
+				},
+				None => {
+					error!(
+						"Could not extract record in column {} for x axis, row {}",
+						set.x_axis_csv_column, row
+					);
+					std::process::exit(1);
+				}
+			};
+			// ux
+			match set.x_axis_error_bar_csv_column {
+				Some(column) => match record.get(column) {
+					Some(string_value) => match string_value.parse::<f32>() {
+						// determine the smallest uncertainty value in x
+						Ok(value) => {
+							if value < min_ux.unwrap() {
+								min_ux = Some(value)
+							}
+							if value > max_ux.unwrap() {
+								max_ux = Some(value)
+							}
+						}
+						Err(e) => {
+							error!(
 										"Could not parse data in column {}, row{}, to f32 for error bar x, error: {}",
 										set.x_axis_csv_column, row, e
 									);
-									std::process::exit(1);
-								}
-							},
-							None => {
-								error!(
-									"Could not extract record in column {} for error bar x, row {}",
-									set.x_axis_csv_column, row
-								);
-								std::process::exit(1);
-							}
-						},
-						None => min_ux = None,
-					};
-					//y
-					match d.get(set.y_axis_csv_column) {
-						Some(string_value) => match string_value.parse::<f32>() {
-							// determine the smallest y value
-							Ok(value) => {
-								if value < min_y {min_y = value}
-								if value > max_y {max_y = value}
-							},
-							Err(e) => {
-								error!(
+							std::process::exit(1);
+						}
+					},
+					None => {
+						error!(
+							"Could not extract record in column {} for error bar x, row {}",
+							set.x_axis_csv_column, row
+						);
+						std::process::exit(1);
+					}
+				},
+				None => min_ux = None,
+			};
+			//y
+			match record.get(set.y_axis_csv_column) {
+				Some(string_value) => match string_value.parse::<f32>() {
+					// determine the smallest y value
+					Ok(value) => {
+						if value < min_y {
+							min_y = value
+						}
+						if value > max_y {
+							max_y = value
+						}
+					}
+					Err(e) => {
+						error!(
 									"Could not parse data in column {}, row {} to f32 for y axis, error: {}",
 									set.x_axis_csv_column, row, e
 								);
-								std::process::exit(1);
+						std::process::exit(1);
+					}
+				},
+				None => {
+					error!(
+						"Could not extract record in column {} for y axis, row {}",
+						set.x_axis_csv_column, row
+					);
+					std::process::exit(1);
+				}
+			};
+			// uy
+			match set.y_axis_error_bar_csv_column {
+				Some(column) => match record.get(column) {
+					// determine the smallest uncertainty value in y
+					Some(string_value) => match string_value.parse::<f32>() {
+						Ok(value) => {
+							if value < min_uy.unwrap() {
+								min_uy = Some(value)
 							}
-						},
-						None => {
-							error!(
-								"Could not extract record in column {} for y axis, row {}",
-								set.x_axis_csv_column, row
-							);
-							std::process::exit(1);
+							if value > max_uy.unwrap() {
+								max_uy = Some(value)
+							}
 						}
-					};
-					// uy
-					match set.y_axis_error_bar_csv_column {
-						Some(column) => match d.get(column) {
-							// determine the smallest uncertainty value in y
-							Some(string_value) => match string_value.parse::<f32>() {
-								Ok(value) => {
-									if value < min_uy.unwrap() { min_uy = Some(value)}
-									if value > max_uy.unwrap() { max_uy = Some(value)}
-								},
-								Err(e) => {
-									error!(
+						Err(e) => {
+							error!(
 										"Could not parse data in column {}, row {} to f32 for y error bar, error: {}",
 										set.x_axis_csv_column, row, e
 									);
-									std::process::exit(1);
-								}
-							},
-							None => {
-								error!(
-									"Could not extract record in column {}, row {} for y error bar",
-									set.x_axis_csv_column, row
-								);
-								std::process::exit(1);
-							}
-						},
-						None => min_uy = None,
-					};
-				}
-				Err(e) => {
-					error!("Cannot read csv record: {}", e);
-					std::process::exit(1);
+							std::process::exit(1);
+						}
+					},
+					None => {
+						error!(
+							"Could not extract record in column {}, row {} for y error bar",
+							set.x_axis_csv_column, row
+						);
+						std::process::exit(1);
+					}
 				},
-			}
-		row +=1;
+				None => min_uy = None,
+			};
+			row += 1;
 		}
 	}
-	return ((min_x as u32, min_y as u32),(max_x as u32, max_y as u32))
+	return ((min_x, min_y), (max_x, max_y));
 }
 
 /// Iterate through the data sets extracing the values from the csv and plot them
-fn build_data_points(data_set: &Vec<DataSet>, csv_delimiter: &str, canvas: &mut ImageBuffer<Rgba<u8>, Vec<u8>>) {
+fn build_data_points(
+	data_set: &Vec<DataSet>,
+	csv_delimiter: &str,
+	canvas: &mut ImageBuffer<Rgba<u8>, Vec<u8>>,
+	x_scale_factor: u32,
+	y_scale_factor: u32,
+	origin_offset: (u32, u32),
+) {
 	// iterate over each set
 	for set in data_set.iter() {
 		// read the csv each set corresponds to
-		let mut data = load_data(set.data_path.as_str(), set.has_headers, csv_delimiter);
+		let data = load_data(set.data_path.as_str(), set.has_headers, csv_delimiter);
 		// used for error debuging
 		let mut row = 1;
-		for record in data.records() {
+		for record in data.iter() {
 			// extract the x-y values from each record
-			match record {
-				Ok(d) => {
-					let x = match d.get(set.x_axis_csv_column) {
-						Some(string_value) => match string_value.parse::<f32>() {
-							Ok(value) => value,
-							Err(e) => {
-								error!(
-									"Could not parse data in column {}, row {} for x axis, error: {}",
-									set.x_axis_csv_column, row, e
-								);
-								std::process::exit(1);
-							}
-						},
-						None => {
+			let x = match record.get(set.x_axis_csv_column) {
+				Some(string_value) => match string_value.parse::<f32>() {
+					Ok(value) => value,
+					Err(e) => {
+						error!(
+							"Could not parse data in column {}, row {} for x axis, error: {}",
+							set.x_axis_csv_column, row, e
+						);
+						std::process::exit(1);
+					}
+				},
+				None => {
+					error!(
+						"Could not extract record in column {}, row {} for x axis",
+						set.x_axis_csv_column, row
+					);
+					std::process::exit(1);
+				}
+			};
+			let ux = match set.x_axis_error_bar_csv_column {
+				Some(column) => match record.get(column) {
+					Some(string_value) => match string_value.parse::<f32>() {
+						Ok(value) => Some(value),
+						Err(e) => {
 							error!(
-								"Could not extract record in column {}, row {} for x axis",
-								set.x_axis_csv_column, row
-							);
-							std::process::exit(1);
-						}
-					};
-					let ux = match set.x_axis_error_bar_csv_column {
-						Some(column) => match d.get(column) {
-							Some(string_value) => match string_value.parse::<f32>() {
-								Ok(value) => Some(value),
-								Err(e) => {
-									error!(
 										"Could not parse data in column {}, row{}, to f32 for error bar x, error: {}",
 										set.x_axis_csv_column, row, e
 									);
-									std::process::exit(1);
-								}
-							},
-							None => {
-								error!(
-									"Could not extract record in column {}, row {} for error bar x",
-									set.x_axis_csv_column, row
-								);
-								std::process::exit(1);
-							}
-						},
-						None => None,
-					};
-					let y = match d.get(set.y_axis_csv_column) {
-						Some(string_value) => match string_value.parse::<f32>() {
-							Ok(value) => value,
-							Err(e) => {
-								error!(
+							std::process::exit(1);
+						}
+					},
+					None => {
+						error!(
+							"Could not extract record in column {}, row {} for error bar x",
+							set.x_axis_csv_column, row
+						);
+						std::process::exit(1);
+					}
+				},
+				None => None,
+			};
+			let y = match record.get(set.y_axis_csv_column) {
+				Some(string_value) => match string_value.parse::<f32>() {
+					Ok(value) => value,
+					Err(e) => {
+						error!(
 									"Could not parse data in column {}, row {} to f32 for y axis, error: {}",
 									set.x_axis_csv_column, row, e
 								);
-								std::process::exit(1);
-							}
-						},
-						None => {
+						std::process::exit(1);
+					}
+				},
+				None => {
+					error!(
+						"Could not extract record in column {}, row {} for y axis",
+						set.x_axis_csv_column, row
+					);
+					std::process::exit(1);
+				}
+			};
+			let uy = match set.y_axis_error_bar_csv_column {
+				Some(column) => match record.get(column) {
+					Some(string_value) => match string_value.parse::<f32>() {
+						Ok(value) => Some(value),
+						Err(e) => {
 							error!(
-								"Could not extract record in column {}, row {} for y axis",
-								set.x_axis_csv_column, row
-							);
-							std::process::exit(1);
-						}
-					};
-					let uy = match set.y_axis_error_bar_csv_column {
-						Some(column) => match d.get(column) {
-							Some(string_value) => match string_value.parse::<f32>() {
-								Ok(value) => Some(value),
-								Err(e) => {
-									error!(
 										"Could not parse data in column {}, row {} to f32 for y error bar, error: {}",
 										set.x_axis_csv_column, row, e
 									);
-									std::process::exit(1);
-								}
-							},
-							None => {
-								error!(
-									"Could not extract record in column {}, row {} for y error bar",
-									set.x_axis_csv_column, row
-								);
-								std::process::exit(1);
-							}
-						},
-						None => None,
-					};
-					// plot the value
-					let point: DataPoint = DataPoint {
-						x,
-						ux,
-						y,
-						uy,
-						colour: set.colour,
-						symbol: set.symbol,
-					};
-					point.draw_point(canvas);
-				}
-				Err(e) => {
-					error!("Cannot read csv record: {}", e);
-					std::process::exit(1);
+							std::process::exit(1);
+						}
+					},
+					None => {
+						error!(
+							"Could not extract record in column {}, row {} for y error bar",
+							set.x_axis_csv_column, row
+						);
+						std::process::exit(1);
+					}
 				},
+				None => None,
 			};
-			row +=1;
+			// plot the value
+			let point: DataPoint = DataPoint {
+				x,
+				ux,
+				y,
+				uy,
+				colour: set.colour,
+				symbol: set.symbol,
+			};
+			point.draw_point(canvas, x_scale_factor, y_scale_factor, origin_offset);
+			row += 1;
 		}
 	}
 }
-
-

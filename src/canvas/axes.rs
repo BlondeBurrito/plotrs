@@ -1,14 +1,14 @@
 //!
 
-use image::{ImageBuffer, Rgba, GenericImage, DynamicImage};
+use image::{DynamicImage, GenericImage, ImageBuffer, Rgba};
 use rusttype::PositionedGlyph;
-use tracing::{error, debug, trace};
+use tracing::{debug, error, trace};
 
-use crate::{get_system_font, colours::*};
+use crate::{colours::*, get_system_font};
 
 use super::glyphs::{create_glyphs, draw_glyphs};
 
-/// Draws the y-axis label onto the canvas, returns how much horizontal space has been occupied
+/// Draws the y-axis label onto the canvas, returns how much horizontal space has been occupied from the left-hand side of the canvas edge
 pub fn build_y_axis_label(
 	canvas: &mut ImageBuffer<Rgba<u8>, Vec<u8>>,
 	label: String,
@@ -116,7 +116,6 @@ fn get_x_axis_label_offset(
 	debug!("X-axis vertical offset: {}", vertical_postion);
 	return (horizontal_position, vertical_postion);
 }
-
 
 /// Within the acceptable pixel space for the axes draw them, note the top left corner of the canvas is the origin `(0, 0)` with bottom right `(canvas.dimensions().0, canvas.dimensions().1)`
 pub fn draw_xy_axes(

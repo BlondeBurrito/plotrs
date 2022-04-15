@@ -1,24 +1,15 @@
 //! Methods for drawing onto a canvas, generating glyphs and saving images
 
-use crate::{colours::*};
+use crate::colours::*;
 use image::{ImageBuffer, Rgba, RgbaImage};
 use regex::Regex;
 use serde::Deserialize;
 use tracing::{debug, error, info, trace, warn};
 
-pub mod title;
 pub mod axes;
 pub mod glyphs;
 pub mod plot;
-
-/// The shape a plotted data point should take
-#[derive(Debug, Deserialize, Copy, Clone)]
-pub enum DataSymbol {
-	Cross,
-	Circle,
-	Triangle,
-	Square,
-}
+pub mod title;
 
 /// Create a blank canvas which can be mutated with content
 pub fn draw_base_canvas(canvas_pixel_size: (u32, u32)) -> ImageBuffer<Rgba<u8>, Vec<u8>> {
@@ -49,5 +40,3 @@ pub fn save_image(imgbuf: ImageBuffer<Rgba<u8>, Vec<u8>>, output_path: &str, tit
 		}
 	}
 }
-
-

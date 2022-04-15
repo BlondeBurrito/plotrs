@@ -1,8 +1,8 @@
 //!
 
 use image::{ImageBuffer, Rgba};
-use rusttype::{PositionedGlyph, Scale, point, Font};
-use tracing::{warn, debug};
+use rusttype::{point, Font, PositionedGlyph, Scale};
+use tracing::{debug, warn};
 
 use crate::colours::*;
 

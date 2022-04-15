@@ -4,9 +4,9 @@ use image::{ImageBuffer, Rgba};
 use rusttype::PositionedGlyph;
 use tracing::debug;
 
-use crate::{get_system_font, colours::*};
+use crate::{colours::*, get_system_font};
 
-use super::glyphs::{draw_glyphs, create_glyphs};
+use super::glyphs::{create_glyphs, draw_glyphs};
 
 /// Draws the title of the graph onto the canvas, returns the amount of vertical pixel space occupied from the top border
 pub fn build_title(
