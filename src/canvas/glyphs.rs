@@ -52,7 +52,7 @@ pub fn create_glyphs<'a>(
 	font.layout(
 		text,
 		scale,
-		point(TEXT_PIXEL_BUFFER, TEXT_PIXEL_BUFFER + v_metrics.ascent),
+		point(0.0, 0.0 + v_metrics.ascent),
 	)
 	.collect()
 }

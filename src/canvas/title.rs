@@ -27,27 +27,33 @@ fn get_title_offset(
 	canvas_width: u32,
 	font_size: f32,
 ) -> (u32, u32) {
-	let mut text_width = 0;
-	let mut max_text_height = 0;
-	for g in glyphs {
-		match g.pixel_bounding_box() {
-			Some(x) => {
-				text_width += x.width();
-				if x.height() > max_text_height {
-					max_text_height = x.height()
-				}
-			}
-			None => {
-				// None indicates whitespace, assume whitespace width is same as font size
-				text_width += font_size as i32;
-			}
-		};
-	}
-	debug!("Title pixel width: {}", text_width);
-	debug!("Title max pixel height: {}", max_text_height);
-	let horizontal_position = (canvas_width / 2) - (text_width as u32 / 2);
+	let width = {
+        let min_x = glyphs
+            .first()
+            .map(|g| g.pixel_bounding_box().unwrap().min.x)
+            .unwrap();
+        let max_x = glyphs
+            .last()
+            .map(|g| g.pixel_bounding_box().unwrap().max.x)
+            .unwrap();
+        (max_x - min_x) as u32
+    };
+	let height = {
+        let min_y = glyphs
+            .first()
+            .map(|g| g.pixel_bounding_box().unwrap().min.y)
+            .unwrap();
+        let max_y = glyphs
+            .last()
+            .map(|g| g.pixel_bounding_box().unwrap().max.y)
+            .unwrap();
+        (max_y - min_y) as u32
+    };
+	debug!("Title width: {}", width);
+	debug!("Title height: {}", height);
+	let horizontal_position = (canvas_width / 2) - (width as u32 / 2);
 	debug!("Title horizontal offset: {}", horizontal_position);
-	let vertical_postion = max_text_height as u32 * 2;
+	let vertical_postion = height as u32;
 	debug!("Title vertical offset: {}", vertical_postion);
 	return (horizontal_position, vertical_postion);
 }

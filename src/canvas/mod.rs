@@ -40,12 +40,3 @@ pub fn save_image(imgbuf: ImageBuffer<Rgba<u8>, Vec<u8>>, output_path: &str, tit
 		}
 	}
 }
-/// When plotting x-y data usually the origin is in the bottom left corner of a canvas, i.e human readable.
-/// 
-/// When placing pixels with the `image` crate the origin is located in the top left corner of the canvas.
-/// 
-/// To allow the code to be more human readable we base the `y` coordinates with an imaginary origin in the
-/// bottom left corner of the canvas. In order to draw the pixel use this function to convert the human `y` position into the `y` position expected by `image`.
-fn flip_y_origin(canvas_height: u32, pixel_y: u32) -> u32{
-	canvas_height - pixel_y
-}

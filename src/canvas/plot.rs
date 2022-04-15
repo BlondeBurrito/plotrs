@@ -2,7 +2,7 @@
 
 use image::{ImageBuffer, Rgba};
 use serde::Deserialize;
-use tracing::{trace, warn, debug};
+use tracing::{debug, trace, warn};
 
 use crate::colours::Colour;
 
@@ -23,7 +23,7 @@ impl DataSymbol {
 		match self {
 			DataSymbol::Cross => {
 				let length: u32 = 5;
-				
+
 				for i in 0..length {
 					// left side of cross
 					pixel_coords.push((origin.0 + i, origin.1));
@@ -34,12 +34,12 @@ impl DataSymbol {
 					// bottom southwards part of cross
 					pixel_coords.push((origin.0, origin.1 - i));
 				}
-			},
+			}
 			DataSymbol::Circle => todo!(),
 			DataSymbol::Triangle => todo!(),
 			DataSymbol::Square => todo!(),
-}
-	return pixel_coords
+		}
+		return pixel_coords;
 	}
 }
 
@@ -60,20 +60,38 @@ pub struct DataPoint {
 	pub symbol: DataSymbol,
 }
 impl DataPoint {
-	pub fn draw_point(self, canvas: &mut ImageBuffer<Rgba<u8>, Vec<u8>>, x_scale_factor: f32, y_scale_factor: f32, offset: (u32, u32)) {
+	pub fn draw_point(
+		self,
+		canvas: &mut ImageBuffer<Rgba<u8>, Vec<u8>>,
+		x_scale_factor: f32,
+		y_scale_factor: f32,
+		offset: (u32, u32),
+	) {
 		trace!("Drawing point {:?}", self);
 		let rgba = Colour::get_pixel_colour(self.colour);
 		let x_pixel_corrected_pos = offset.0 + (self.x * x_scale_factor) as u32;
 		// note pixel postions on a canvas are from top-left corner origin so additionally adjust y position based
 		// on canvas height by minusing the offset to centre it at the axis origin and then minus scaled pixels
-		let y_pixel_corrected_pos = canvas.dimensions().1 - offset.1 - (self.y * y_scale_factor) as u32;
-		trace!("Plotting data point ({}, {}) with pixel position ({}, {})", self.x, self.y, x_pixel_corrected_pos, y_pixel_corrected_pos);
+		let y_pixel_corrected_pos =
+			canvas.dimensions().1 - offset.1 - (self.y * y_scale_factor) as u32;
+		trace!(
+			"Plotting data point ({}, {}) with pixel position ({}, {})",
+			self.x,
+			self.y,
+			x_pixel_corrected_pos,
+			y_pixel_corrected_pos
+		);
 		// find the pixels that corrpespond to the symbol shape
-		let pixels_in_shape = self.symbol.find_pixels((x_pixel_corrected_pos, y_pixel_corrected_pos));
+		let pixels_in_shape = self
+			.symbol
+			.find_pixels((x_pixel_corrected_pos, y_pixel_corrected_pos));
 		for (px, py) in pixels_in_shape.iter() {
 			match canvas.get_pixel_mut_checked(*px, *py) {
 				Some(pixel) => *pixel = Rgba(rgba),
-				None => warn!("Cannot plot data point ({}, {}) with symbol pixel position ({}, {})", self.x, self.y, x_pixel_corrected_pos, y_pixel_corrected_pos),
+				None => warn!(
+					"Cannot plot data point ({}, {}) with symbol pixel position ({}, {})",
+					self.x, self.y, x_pixel_corrected_pos, y_pixel_corrected_pos
+				),
 			}
 		}
 	}
