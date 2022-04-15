@@ -23,13 +23,14 @@ impl FontSizes {
 		// line height is the root of canvas wdith
 		let line_height = (canvas_pixel_size.0 as f32).sqrt();
 		// font size is line height divided by the ratio
-		let title_font_size = line_height / gr;
+		// we include a scale based on testing of 1.5
+		let title_font_size = 1.5 * line_height / gr;
 		debug!("Calculated title font size to be {}", title_font_size);
 		// axis font size is based on a reduction of title size
 		let axis_font_size = title_font_size / 2.0;
 		debug!("Calculated x-axis font size to be {}", axis_font_size);
 		//TODO: is there a better wa of scaling axis unit size?
-		let axis_unit_font_size = axis_font_size * 0.75;
+		let axis_unit_font_size = axis_font_size * 1.0;
 		FontSizes {
 			title_font_size: title_font_size,
 			axis_font_size: axis_font_size,

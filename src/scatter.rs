@@ -8,7 +8,7 @@ use tracing::{debug, error, info};
 
 use crate::{
 	canvas::{
-		axes::build_x_axis_label, axes::build_y_axis_label, axes::draw_xy_axes, draw_base_canvas,
+		axes::build_x_axis_label, axes::build_y_axis_label, axes::{draw_xy_axes, get_xy_axis_pixel_origin, get_xy_axis_pixel_max, get_x_axis_pixel_length, get_y_axis_pixel_length}, draw_base_canvas,
 		glyphs::FontSizes, glyphs::TEXT_PIXEL_BUFFER, plot::DataPoint, save_image,
 		title::build_title, plot::DataSymbol,
 	},
@@ -24,8 +24,14 @@ struct Scatter {
 	canvas_pixel_size: (u32, u32),
 	/// X-axis label
 	x_axis_label: String,
+	/// Number of times the x-axis will be divided to show your data scale. Advised to make it a ratio of your largest x value
+	x_axis_resolution: u32,
 	/// Y-axis label
 	y_axis_label: String,
+	/// Number of times the y-axis will be divided to show your data scale. Advised to make it a ratio of your largest y value
+	y_axis_resolution: u32,
+	/// Should the graph has a light grey background grid
+	has_grid: bool,
 	/// Defines where the data is and which parts to use
 	data_sets: Vec<DataSet>,
 	/// Should a legend be generated
@@ -61,48 +67,51 @@ pub fn scatter_builder(path: &str, output: &str, csv_delimiter: &str) {
 	let mut canvas = draw_base_canvas(scatter.canvas_pixel_size);
 	// calcualte font sizes
 	let font_sizes = FontSizes::new(&scatter.canvas_pixel_size);
-	// always create the y-axis label first as it's more complicated and will overwrite existing data
+	// Draw text onto the graph, this also tells us how much of the canvas has now been occupied allowing
+	// us to calculate the amount of space the axes themselves can take up.
+	// Always create the y-axis label first as it's more complicated and will overwrite existing pixel data
 	let horizontal_pixels_used =
 		build_y_axis_label(&mut canvas, scatter.y_axis_label, font_sizes.axis_font_size);
 	let vertical_pixels_used_from_bottom =
 		build_x_axis_label(&mut canvas, scatter.x_axis_label, font_sizes.axis_font_size);
 	let vertical_pixels_used_from_top =
 		build_title(&mut canvas, &scatter.title, font_sizes.title_font_size);
-	// with the text drawn we need to know how much space is available for the axes
-	// note origin is top-left corner of canvas, so minimum y value is greater than maximum y value
-	// TODO: there must be a better way than hardcoding scaling factors below
+	// legend_scale_factor decides how much horizontal space should be reserved for a legend
 	let legend_scale_factor = if scatter.has_legend { 3 } else { 1 };
-	let axis_min = (
-		horizontal_pixels_used + TEXT_PIXEL_BUFFER as u32 * 5,
-		vertical_pixels_used_from_bottom - TEXT_PIXEL_BUFFER as u32 * 2,
-	);
-	let axis_max = (
-		canvas.dimensions().0 - (axis_min.0 * legend_scale_factor),
-		(vertical_pixels_used_from_top + TEXT_PIXEL_BUFFER as u32) * 2,
-	);
+	// TODO: calc pixel position of legend
+	// With the text drawn we can calculate the rectangular space for the axes, represrnted as two tuples
+	// pinpointing the bottom left origin of the graph and the top right corner.
+	// Pixel position of axes origin
+	let axis_min: (u32, u32) = get_xy_axis_pixel_origin(horizontal_pixels_used, vertical_pixels_used_from_bottom);
+	// Pixel position showing the maximum extents of the axes
+	let axis_max: (u32, u32) = get_xy_axis_pixel_max(canvas.dimensions().0, axis_min.0, vertical_pixels_used_from_top, legend_scale_factor);
 	debug!("Origin axis placement {:?}", axis_min);
 	debug!("Maximun axis placement {:?}", axis_max);
-	draw_xy_axes(&mut canvas, axis_min, axis_max);
-	// we need to know how the data scales to the length of axes for plotting,
+	// We need to know how the csv data scales to the length of axes for plotting,
 	// ie. we need a scale factor of how many units of data there is to one pixel
-	// first we need the axis length
-	let x_axis_length = axis_max.0 - axis_min.0;
-	let y_axis_length = axis_min.1 - axis_max.1;
+	// First we need the axis length
+	let x_axis_length = get_x_axis_pixel_length(axis_min.0, axis_max.0);
+	// Y-axis max is in fact a smaller number due to canvas origin
+	let y_axis_length = get_y_axis_pixel_length(axis_max.1, axis_min.1);
 	debug!("X-axis length {}", x_axis_length);
 	debug!("Y-axis length {}", y_axis_length);
 	// next we need to know the 'size' of our data, min x-y and max x-y
 	let bounds: ((f32, f32), (f32, f32)) = get_data_bounds(&scatter.data_sets, csv_delimiter);
 	debug!("Min and max data points: {:?}", bounds);
-	// we want to create buffer space around our bounds so data points are not plotted directly on an axis
+	// We want to create buffer space around our bounds so data points are not plotted directly on an axis, if
+	// large symbols are used for plotting they may obscure data labels on an axis
 	let bounds_with_buffer: ((u32, u32), (u32, u32)) = (((bounds.0.0 / 1.5) as u32, (bounds.0.1 / 1.5) as u32), ((bounds.1.0 * 1.2) as u32, (bounds.1.1 * 1.2) as u32));
 	debug!("Axes bounds {:?}", bounds_with_buffer);
-	// now we can find the number of axis units per x and y
-	//TODO: single row data set causes divide b zero
-	let x_axis_data_scale_factor: u32 = x_axis_length / (bounds_with_buffer.1.0 - bounds_with_buffer.0.0);
-	let y_axis_data_scale_factor: u32 = y_axis_length / (bounds_with_buffer.1.1 - bounds_with_buffer.0.1);
+	// Now we can find the number of axis units per x and y
+	//TODO: single row data set causes divide by zero
+	let x_axis_data_scale_factor: f32 = x_axis_length as f32 / (bounds_with_buffer.1.0 as f32 - bounds_with_buffer.0.0 as f32);
+	let y_axis_data_scale_factor: f32 = y_axis_length as f32 / (bounds_with_buffer.1.1 as f32 - bounds_with_buffer.0.1 as f32);
 	debug!("X-axis scale factor {}", x_axis_data_scale_factor);
 	debug!("Y-axis scale factor {}", y_axis_data_scale_factor);
 
+	draw_xy_axes(&mut canvas, axis_min, axis_max, (bounds_with_buffer.0.0, bounds_with_buffer.1.0), font_sizes.axis_unit_font_size, scatter.has_grid, scatter.x_axis_resolution, scatter.y_axis_resolution);
+	// if a line of best fit has been specified then draw it
+	//TODO: best fit
 	// get the csv data content and plot it
 	build_data_points(&scatter.data_sets, csv_delimiter, &mut canvas, x_axis_data_scale_factor, y_axis_data_scale_factor,(axis_min.0, axis_max.1));
 
@@ -283,8 +292,8 @@ fn build_data_points(
 	data_set: &Vec<DataSet>,
 	csv_delimiter: &str,
 	canvas: &mut ImageBuffer<Rgba<u8>, Vec<u8>>,
-	x_scale_factor: u32,
-	y_scale_factor: u32,
+	x_scale_factor: f32,
+	y_scale_factor: f32,
 	origin_offset: (u32, u32),
 ) {
 	// iterate over each set

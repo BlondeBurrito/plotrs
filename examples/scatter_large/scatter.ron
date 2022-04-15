@@ -2,7 +2,10 @@ Scatter(
 	title: "A Large Graph for Testing Positions of Graph Elements",
 	canvas_pixel_size: (1920, 1080),
 	x_axis_label: "Time (ms)",
+	x_axis_resolution: 10, // Number of times the x-axis will be divided to show your data scale. Advised to make it a ratio of your largest x value
 	y_axis_label: "Energy (kJ)",
+	y_axis_resolution: 10, // Number of times the y-axis will be divided to show your data scale. Advised to make it a ratio of your largest y value
+	has_grid: true, //Should the graph has a light grey background grid
 	data_sets: [
 		DataSet(
 			data_path: "scatter.csv",

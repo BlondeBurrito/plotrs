@@ -4,6 +4,7 @@ use serde::Deserialize;
 
 pub const WHITE: [u8; 4] = [255, 255, 255, 255];
 pub const BLACK: [u8; 4] = [0, 0, 0, 255];
+pub const GREY: [u8; 4] = [161, 161, 161, 255];
 pub const ORANGE: [u8; 4] = [255, 146, 0, 255];
 pub const RED: [u8; 4] = [255, 0, 0, 255];
 pub const BLUE: [u8; 4] = [0, 255, 0, 255];
