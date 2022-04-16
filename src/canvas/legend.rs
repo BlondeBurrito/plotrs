@@ -28,6 +28,9 @@ pub fn build_legend(
 	debug!("Building legend at {:?}...", origin);
 	let font = get_system_font();
 	let items = fields.len();
+	// As symbols have different radii we want to find the maximum so we can space out the legend elements
+	// with the same offset
+	let max_radius: u32 = fields.iter().max_by(|a, b| a.symbol_radius.cmp(&b.symbol_radius)).unwrap().symbol_radius;
 	for i in 0..items {
 		let field = &fields[i];
 		trace!("Legend field {:?}", field);
@@ -45,7 +48,7 @@ pub fn build_legend(
 			(max_y - min_y) as u32 * 2
 		};
 		let symbol_position = (
-			origin.0 + ((field.symbol_radius + 1) * (field.symbol_thickness + 1)),
+			origin.0 + ((max_radius + 1)),
 			origin.1 + (i as u32 * height * 2),
 		);
 		let pixels =
@@ -62,7 +65,7 @@ pub fn build_legend(
 			}
 		}
 		let text_position = (
-			origin.0 + ((field.symbol_radius + 1) * (field.symbol_thickness + 1)) * 2,
+			origin.0 + (max_radius + 1) * 3,
 			origin.1 + (i as u32 * height * 2),
 		);
 		draw_glyphs(canvas, BLACK, glyphs, text_position);
