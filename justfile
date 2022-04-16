@@ -54,3 +54,4 @@ install:
 generate-examples: install
   cd examples/scatter/; plotit.exe -g scatter -c scatter.ron -o . -v
   cd examples/scatter_large/; plotit.exe -g scatter -c scatter.ron -o . -v
+  cd examples/scatter_multidata_one_csv/; plotit.exe -g scatter -c scatter.ron -o . -v

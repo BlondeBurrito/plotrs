@@ -6,13 +6,12 @@ use tracing::{debug, warn};
 
 use crate::colours::*;
 
-pub const TEXT_PIXEL_BUFFER: f32 = 20.0;
-
 /// Font sizes for the different elements of a graph
 pub struct FontSizes {
 	pub title_font_size: f32,
 	pub axis_font_size: f32,
 	pub axis_unit_font_size: f32,
+	pub legend_font_size: f32,
 }
 
 impl FontSizes {
@@ -31,10 +30,13 @@ impl FontSizes {
 		debug!("Calculated x-axis font size to be {}", axis_font_size);
 		//TODO: is there a better wa of scaling axis unit size?
 		let axis_unit_font_size = axis_font_size * 1.0;
+		//TODO: is there a better way to calc legend font size?
+		let legend_font_size = axis_font_size;
 		FontSizes {
 			title_font_size: title_font_size,
 			axis_font_size: axis_font_size,
 			axis_unit_font_size: axis_unit_font_size,
+			legend_font_size: legend_font_size,
 		}
 	}
 }
@@ -49,12 +51,8 @@ pub fn create_glyphs<'a>(
 	let v_metrics = font.v_metrics(scale);
 
 	// layout the glyphs in a line with TEXT_PIXEL_BUFFER pixels padding
-	font.layout(
-		text,
-		scale,
-		point(0.0, 0.0 + v_metrics.ascent),
-	)
-	.collect()
+	font.layout(text, scale, point(0.0, 0.0 + v_metrics.ascent))
+		.collect()
 }
 /// Draws glyphs onto the canvas at a given position
 pub fn draw_glyphs(

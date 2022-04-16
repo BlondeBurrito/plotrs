@@ -3,11 +3,11 @@
 use crate::colours::*;
 use image::{ImageBuffer, Rgba, RgbaImage};
 use regex::Regex;
-use serde::Deserialize;
-use tracing::{debug, error, info, trace, warn};
+use tracing::{error, info};
 
 pub mod axes;
 pub mod glyphs;
+pub mod legend;
 pub mod plot;
 pub mod title;
 

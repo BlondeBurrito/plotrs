@@ -16,7 +16,7 @@ use crate::{
 		},
 		draw_base_canvas,
 		glyphs::FontSizes,
-		glyphs::TEXT_PIXEL_BUFFER,
+		legend::{build_legend, LegendField},
 		plot::DataPoint,
 		plot::DataSymbol,
 		save_image,
@@ -42,10 +42,10 @@ struct Scatter {
 	y_axis_resolution: u32,
 	/// Should the graph has a light grey background grid
 	has_grid: bool,
-	/// Defines where the data is and which parts to use
-	data_sets: Vec<DataSet>,
 	/// Should a legend be generated
 	has_legend: bool,
+	/// Defines where the data is and which parts to use
+	data_sets: Vec<DataSet>,
 }
 /// The source of each data set and how it should be represented
 #[derive(Debug, Deserialize)]
@@ -68,6 +68,10 @@ struct DataSet {
 	colour: Colour,
 	/// The shape used to represent the data point
 	symbol: DataSymbol,
+	/// The size of a drawn symbol in (1+ symbol_radius) pixels
+	symbol_radius: u32,
+	/// The thinkness of a drawn symbol in (1 + symbol_thickness) pixels
+	symbol_thickness: u32,
 }
 
 /// Creates a canvas and draws the scatter graph over it
@@ -77,7 +81,7 @@ pub fn scatter_builder(path: &str, output: &str, csv_delimiter: &str) {
 	let mut canvas = draw_base_canvas(scatter.canvas_pixel_size);
 	// calcualte font sizes
 	let font_sizes = FontSizes::new(&scatter.canvas_pixel_size);
-	// Draw text onto the graph, this also tells us how much of the canvas has now been occupied allowing
+	// Draw text onto the graph, this also tells us how much of the canvas has been occupied allowing
 	// us to calculate the amount of space the axes themselves can take up.
 	// Always create the y-axis label first as it's more complicated and will overwrite existing pixel data
 	let horizontal_pixels_used =
@@ -87,19 +91,23 @@ pub fn scatter_builder(path: &str, output: &str, csv_delimiter: &str) {
 	let vertical_pixels_used_from_top =
 		build_title(&mut canvas, &scatter.title, font_sizes.title_font_size);
 	// legend_scale_factor decides how much horizontal space should be reserved for a legend
-	let legend_scale_factor = if scatter.has_legend { 3 } else { 1 };
-	// TODO: calc pixel position of legend
+	let legend_scale_factor = if scatter.has_legend { 2 } else { 1 };
 	// With the text drawn we can calculate the rectangular space for the axes, represrnted as two tuples
 	// pinpointing the bottom left origin of the graph and the top right corner.
 	// Pixel position of axes origin
-	let axis_min: (u32, u32) =
-		get_xy_axis_pixel_origin(horizontal_pixels_used, vertical_pixels_used_from_bottom, canvas.dimensions());
+	let axis_min: (u32, u32) = get_xy_axis_pixel_origin(
+		horizontal_pixels_used,
+		vertical_pixels_used_from_bottom,
+		canvas.dimensions(),
+	);
 	// Pixel position showing the maximum extents of the axes
 	let axis_max: (u32, u32) = get_xy_axis_pixel_max(
-		axis_min.0,
+		axis_min,
 		vertical_pixels_used_from_top,
 		legend_scale_factor,
 		canvas.dimensions(),
+		scatter.x_axis_resolution,
+		scatter.y_axis_resolution
 	);
 	debug!("Origin axis placement {:?}", axis_min);
 	debug!("Maximun axis placement {:?}", axis_max);
@@ -107,7 +115,7 @@ pub fn scatter_builder(path: &str, output: &str, csv_delimiter: &str) {
 	// ie. we need a scale factor of how many units of data there is to one pixel
 	// First we need the axis length
 	let x_axis_length = get_x_axis_pixel_length(axis_min.0, axis_max.0);
-	// Y-axis max is in fact a smaller number due to canvas origin
+	// Y-axis max is in fact a smaller number due to canvas image origin
 	let y_axis_length = get_y_axis_pixel_length(axis_max.1, axis_min.1);
 	debug!("X-axis length {}", x_axis_length);
 	debug!("Y-axis length {}", y_axis_length);
@@ -117,10 +125,12 @@ pub fn scatter_builder(path: &str, output: &str, csv_delimiter: &str) {
 	// We want to create buffer space around our bounds so data points are not plotted directly on an axis, if
 	// large symbols are used for plotting they may obscure data labels on an axis
 	let bounds_with_buffer: ((u32, u32), (u32, u32)) = (
-		((bounds.0 .0 / 1.5) as u32, (bounds.0 .1 / 1.5) as u32),
-		((bounds.1 .0 * 1.2) as u32, (bounds.1 .1 * 1.2) as u32),
+		((bounds.0 .0 / 1.1) as u32, (bounds.0 .1 / 1.1) as u32),
+		((bounds.1 .0 * 1.1) as u32, (bounds.1 .1 * 1.1) as u32),
 	);
 	debug!("Axes bounds {:?}", bounds_with_buffer);
+	let x_data_min_max_limits: (u32, u32) = (bounds_with_buffer.0 .0, bounds_with_buffer.1 .0);
+	let y_data_min_max_limits: (u32, u32) = (bounds_with_buffer.0 .1, bounds_with_buffer.1 .1);
 	// Now we can find the number of axis units per x and y
 	//TODO: single row data set causes divide by zero
 	let x_axis_data_scale_factor: f32 =
@@ -134,13 +144,26 @@ pub fn scatter_builder(path: &str, output: &str, csv_delimiter: &str) {
 		&mut canvas,
 		axis_min,
 		axis_max,
-		(bounds_with_buffer.0 .0, bounds_with_buffer.1 .0),
-		(bounds_with_buffer.0 .1, bounds_with_buffer.1 .1),
+		x_axis_length,
+		y_axis_length,
+		x_data_min_max_limits,
+		y_data_min_max_limits,
 		font_sizes.axis_unit_font_size,
 		scatter.has_grid,
 		scatter.x_axis_resolution,
 		scatter.y_axis_resolution,
 	);
+	// optionall build the legend
+	if scatter.has_legend {
+		let legend_fields = get_legend_fields(&scatter.data_sets);
+		let legend_origin: (u32, u32) = axis_max;
+		build_legend(
+			&mut canvas,
+			legend_origin,
+			legend_fields,
+			font_sizes.legend_font_size,
+		);
+	}
 	// if a line of best fit has been specified then draw it
 	//TODO: best fit
 	// get the csv data content and plot it
@@ -150,7 +173,7 @@ pub fn scatter_builder(path: &str, output: &str, csv_delimiter: &str) {
 		&mut canvas,
 		x_axis_data_scale_factor,
 		y_axis_data_scale_factor,
-		(axis_min.0, axis_max.1),
+		(axis_min.0, axis_min.1),
 	);
 
 	// save the resulting image
@@ -187,13 +210,13 @@ impl Scatter {
 // This faciliates drawing values on axes and finding the ratio of pixels to a data point for plotting
 fn get_data_bounds(data_set: &Vec<DataSet>, csv_delimiter: &str) -> ((f32, f32), (f32, f32)) {
 	let mut min_x = f32::MAX;
-	let mut min_ux = Some(f32::MAX);
+	let mut min_ux = Some(f32::MAX); // TODO: unused at present
 	let mut min_y = f32::MAX;
-	let mut min_uy = Some(f32::MAX);
+	let mut min_uy = Some(f32::MAX); // TODO: unused at present
 	let mut max_x = 0.0;
-	let mut max_ux = Some(0.0);
+	let mut max_ux = Some(0.0); // TODO: unused at present
 	let mut max_y = 0.0;
-	let mut max_uy = Some(0.0);
+	let mut max_uy = Some(0.0); // TODO: unused at present
 	// iterate over each set
 	for set in data_set.iter() {
 		// read the csv each set corresponds to
@@ -432,9 +455,25 @@ fn build_data_points(
 				uy,
 				colour: set.colour,
 				symbol: set.symbol,
+				symbol_radius: set.symbol_radius,
+				symbol_thickness: set.symbol_thickness,
 			};
 			point.draw_point(canvas, x_scale_factor, y_scale_factor, origin_offset);
 			row += 1;
 		}
 	}
+}
+/// Extracts the colour, symbol and data set names for use in building a legend
+fn get_legend_fields(data_set: &Vec<DataSet>) -> Vec<LegendField> {
+	let mut legend_fields: Vec<LegendField> = Vec::new();
+	for set in data_set.iter() {
+		legend_fields.push(LegendField {
+			symbol: set.symbol,
+			symbol_radius: set.symbol_radius,
+			symbol_thickness: set.symbol_thickness,
+			colour: set.colour,
+			name: set.name.to_owned(),
+		});
+	}
+	return legend_fields;
 }

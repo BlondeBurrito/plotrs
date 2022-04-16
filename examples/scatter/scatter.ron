@@ -1,11 +1,12 @@
 Scatter(
-	title: "Engery against Time for Leptic Quarks-Baby!",
+	title: "Engery against Time for Fuzzing About Things",
 	canvas_pixel_size: (800, 600),
 	x_axis_label: "Time (ms)",
-	x_axis_resolution: 6, // Number of times the x-axis will be divided to show your data scale. Advised to make it a ratio of your largest x value
+	x_axis_resolution: 11, // Number of times the x-axis will be divided to show your data scale. Advised to make it a ratio of your largest x value
 	y_axis_label: "Energy (kJ)",
-	y_axis_resolution: 10, // Number of times the y-axis will be divided to show your data scale. Advised to make it a ratio of your largest y value
+	y_axis_resolution: 11, // Number of times the y-axis will be divided to show your data scale. Advised to make it a ratio of your largest y value
 	has_grid: true, //Should the graph has a light grey background grid
+	has_legend: false, // should a legend be generated? Only really useful with multiple data sets
 	data_sets: [
 		DataSet(
 			data_path: "scatter.csv",
@@ -17,7 +18,8 @@ Scatter(
 			name: "Very interesting", // if generating a legend will indicate which colour correspond to which data set
 			colour: Orange, // the colour to render a data point
 			symbol: Cross, // the shape a plotted data point should take
+			symbol_radius: 5, // The size of a drawn symbol in (1+ symbol_radius) pixels
+			symbol_thickness: 0, // The thinkness of a drawn symbol in (1 + symbol_thickness) pixels
 		),
 	],
-	has_legend: false // should a legend be generated? Only really useful with multiple data sets
 )
