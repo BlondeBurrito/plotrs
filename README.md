@@ -27,13 +27,35 @@ E.g
 plotit -g scatter -c examples/scatter/scatter.ron -o examples/scatter
 ```
 
-Note that if your canvas is too small then your title and axis label test will become blurry.
+Note that if your canvas is too small then your title and axis labels may become blurry.
 
 ## Examples
 
-Currently commented out, as I use clippy more I suspect to customise what it does.
+### [Simple Scatter](https://github.com/BlondeBurrito/plotit/tree/main/examples/scatter)
 
-<img src="docs/abstract_example.png" alt="abs" width="370"/>
+<img src="examples/scatter/engery_against_time_for_fuzzing_about_things.png" alt="s" width="400"/>
+
+### [Image Size Scales Elements Dynamically](https://github.com/BlondeBurrito/plotit/tree/main/examples/scatter_large)
+
+Based on the dimensions of your image (`canvas_size`) the text and axes positions are automatically calculated. You can also toggle a light grey background grid drawn the from axes scales.
+
+<img src="examples/scatter_large/a_large_graph_for_testing_positions_of_graph_elements_and_stuff.png" alt="s" width="800"/>
+
+### [Scatter Multidata](https://github.com/BlondeBurrito/plotit/tree/main/examples/scatter_multidata_one_csv)
+
+From single or multiple `csv` files you can plot several data sets onto a single graph. Each data set can be configured to plot with a different colour and/or symbol. The legend can be toggled on and off. The size and thickness of the symbols are configurable on a per data set basis.
+
+<img src="examples/scatter_multidata_one_csv/oh_wow__multiple_data_sets.png" alt="s" width="800"/>
+
+### [Scatter Error Bars](https://github.com/BlondeBurrito/plotit/tree/main/examples/scatter_error_bars)
+
+You can also indicate uncertainty with the use of error bars which can be specified for either axes.
+
+<img src="examples/scatter_error_bars/we_have_some_certainty_in_y.png" alt="s" width="800"/>
+<img src="examples/scatter_error_bars/we_have_some_certainty_in_x_and_y.png" alt="s" width="800"/>
+
+
+## Contributing
 
 ## LICENSE
 

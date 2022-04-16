@@ -91,7 +91,8 @@ pub fn scatter_builder(path: &str, output: &str, csv_delimiter: &str) {
 	let vertical_pixels_used_from_top =
 		build_title(&mut canvas, &scatter.title, font_sizes.title_font_size);
 	// legend_scale_factor decides how much horizontal space should be reserved for a legend
-	let legend_scale_factor = if scatter.has_legend { 2 } else { 1 };
+	//TODO: there must be a nicer way reserve some legend space, for true 2 is way too big
+	let legend_scale_factor = if scatter.has_legend { 1 } else { 1 };
 	// With the text drawn we can calculate the rectangular space for the axes, represrnted as two tuples
 	// pinpointing the bottom left origin of the graph and the top right corner.
 	// Pixel position of axes origin
@@ -156,7 +157,7 @@ pub fn scatter_builder(path: &str, output: &str, csv_delimiter: &str) {
 	// optionall build the legend
 	if scatter.has_legend {
 		let legend_fields = get_legend_fields(&scatter.data_sets);
-		let legend_origin: (u32, u32) = axis_max;
+		let legend_origin: (u32, u32) = (axis_max.0, axis_max.1 * 2);
 		build_legend(
 			&mut canvas,
 			legend_origin,
@@ -357,6 +358,7 @@ fn build_data_points(
 	y_scale_factor: f32,
 	origin_offset: (u32, u32),
 ) {
+	debug!("Building data points...");
 	// iterate over each set
 	for set in data_set.iter() {
 		// read the csv each set corresponds to

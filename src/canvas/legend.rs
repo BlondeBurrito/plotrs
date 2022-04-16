@@ -32,7 +32,7 @@ pub fn build_legend(
 		let field = &fields[i];
 		trace!("Legend field {:?}", field);
 		let glyphs = create_glyphs(font_size, &field.name, &font);
-		// used to write legend fields on new rows
+		// height is used to write legend fields on new rows
 		let height = {
 			let min_y = glyphs
 				.first()
@@ -42,7 +42,7 @@ pub fn build_legend(
 				.last()
 				.map(|g| g.pixel_bounding_box().unwrap().max.y)
 				.unwrap();
-			(max_y - min_y) as u32
+			(max_y - min_y) as u32 * 2
 		};
 		let symbol_position = (
 			origin.0 + ((field.symbol_radius + 1) * (field.symbol_thickness + 1)),

@@ -5,7 +5,7 @@ Scatter(
 	x_axis_resolution: 11, // Number of times the x-axis will be divided to show your data scale. Advised to make it a ratio of your largest x value
 	y_axis_label: "Energy (kJ)",
 	y_axis_resolution: 11, // Number of times the y-axis will be divided to show your data scale. Advised to make it a ratio of your largest y value
-	has_grid: true, //Should the graph has a light grey background grid
+	has_grid: true, // Should the graph have a light grey background grid
 	has_legend: false, // should a legend be generated? Only really useful with multiple data sets
 	data_sets: [
 		DataSet(
@@ -13,9 +13,9 @@ Scatter(
 			has_headers: true, // if your data has headers set to `true` so they can be ignored
 			x_axis_csv_column: 0, // which column contains the x values
 			x_axis_error_bar_csv_column: None, // which column contains x uncertainty Some(usize) or None
-			y_axis_csv_column: 1, // which column contains the  values
+			y_axis_csv_column: 1, // which column contains the y values
 			y_axis_error_bar_csv_column: None, // which column contains y uncertainty Some(usize) or None
-			name: "Very interesting", // if generating a legend will indicate which colour correspond to which data set
+			name: "Very interesting", // legend will indicate which colour and symbol correspond to which data set
 			colour: Orange, // the colour to render a data point
 			symbol: Cross, // the shape a plotted data point should take
 			symbol_radius: 5, // The size of a drawn symbol in (1+ symbol_radius) pixels
