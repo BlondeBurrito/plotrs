@@ -67,10 +67,42 @@ impl DataSymbol {
 					}
 				}
 			},
-			DataSymbol::Triangle => todo!(),
-			DataSymbol::Square => todo!(),
+			DataSymbol::Triangle => {
+				pixel_coords.push(origin);
+				// To draw an equilateral triangle with a corner facing northwards we can 
+				// find the coords of each corner, find 3 equations of a straight line to
+				// join them up and iterate over the known `x` coord to place the pixels
+				// along each line.
+				// The 3 corners
+				
+			},
+			DataSymbol::Square => {
+				pixel_coords.push(origin);
+				for i in 0..(radius + 1) {
+					for n in 0..=thickness {
+						// top right horizontal
+						pixel_coords.push((origin.0 + i + n, origin.1 - radius -n));
+						// top left horizontal
+						pixel_coords.push((origin.0 - i - n, origin.1 - radius -n));
+						// bottom right horizontal
+						pixel_coords.push((origin.0 + i + n, origin.1 + radius + n));
+						// bottom left horizontal
+						pixel_coords.push((origin.0 - i - n, origin.1 + radius + n));
+						// left upper vertical
+						pixel_coords.push((origin.0 - radius -n, origin.1 - i - n));
+						// left bottom vertical
+						pixel_coords.push((origin.0 - radius -n, origin.1 + i + n));
+						// right upper vertical
+						pixel_coords.push((origin.0 + radius + n, origin.1 - i -n));
+						// right bottom vertical
+						pixel_coords.push((origin.0 + radius + n, origin.1 + i + n));
+					}
+					
+				}
+			},
 			DataSymbol::Point => {
-				// it's ust the original pixel
+				// it's just the original pixel
+				pixel_coords.push(origin);
 			},
 		}
 		return pixel_coords;
