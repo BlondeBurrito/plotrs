@@ -54,7 +54,6 @@ You can also indicate uncertainty with the use of error bars which can be specif
 <img src="examples/scatter_error_bars/we_have_some_certainty_in_y.png" alt="s" width="800"/>
 <img src="examples/scatter_error_bars/we_have_some_certainty_in_x_and_y.png" alt="s" width="800"/>
 
-
 ## Contributing
 
 ## LICENSE

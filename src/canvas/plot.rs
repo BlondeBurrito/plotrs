@@ -1,5 +1,7 @@
 //!
 
+use std::f32::consts::PI;
+
 use image::{ImageBuffer, Rgba};
 use serde::Deserialize;
 use tracing::{debug, trace, warn};
@@ -20,12 +22,10 @@ impl DataSymbol {
 	/// Based on the `DataSymbol` type find the pixels that make up its shape
 	pub fn find_pixels(self, origin: (u32, u32), thickness: u32, radius: u32) -> Vec<(u32, u32)> {
 		let mut pixel_coords: Vec<(u32, u32)> = Vec::new();
-		pixel_coords.push(origin);
 		match self {
 			DataSymbol::Cross => {
-				let length: u32 = (radius + 1) * (thickness + 1);
-
-				for i in 0..length {
+				pixel_coords.push(origin);
+				for i in 0..(radius + 1) {
 					// right side of cross
 					pixel_coords.push((origin.0 + i, origin.1));
 					for n in 0..=thickness {
@@ -52,7 +52,21 @@ impl DataSymbol {
 					}
 				}
 			}
-			DataSymbol::Circle => todo!(),
+			DataSymbol::Circle => {
+				pixel_coords.push(origin);
+				let mut angles = Vec::new();
+				let segments: u32 = 124;
+				for i in 0..segments {angles.push((2.0 * PI/segments as f32) * i as f32)};
+				for angle in angles.iter() {
+					for n in 0..=thickness {
+						let y = angle.sin() * (radius + 1 + n) as f32;
+						let x = angle.cos() * (radius + 1 + n) as f32;
+						let delta_x = origin.0 as f32 + x;
+						let delta_y = origin.1 as f32 + y;
+						pixel_coords.push((delta_x as u32, delta_y as u32));
+					}
+				}
+			},
 			DataSymbol::Triangle => todo!(),
 			DataSymbol::Square => todo!(),
 			DataSymbol::Point => {
