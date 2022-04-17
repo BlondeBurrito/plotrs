@@ -18,7 +18,7 @@ Scatter(
 			name: "First csv", // legend will indicate which colour and symbol correspond to which data set
 			colour: Green, // the colour to render a data point
 			symbol: Triangle, // the shape a plotted data point should take
-			symbol_radius: 7, // The size of a drawn symbol in (1+ symbol_radius) pixels
+			symbol_radius: 14, // The size of a drawn symbol in (1+ symbol_radius) pixels
 			symbol_thickness: 2, // The thinkness of a drawn symbol in (1 + symbol_thickness) pixels
 		),
 		DataSet(

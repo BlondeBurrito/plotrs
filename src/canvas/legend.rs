@@ -30,7 +30,7 @@ pub fn build_legend(
 	let items = fields.len();
 	// As symbols have different radii we want to find the maximum so we can space out the legend elements
 	// with the same offset
-	let max_radius: u32 = fields.iter().max_by(|a, b| a.symbol_radius.cmp(&b.symbol_radius)).unwrap().symbol_radius;
+	let max_radius: u32 = fields.iter().max_by(|a, b| a.symbol_radius.cmp(&b.symbol_radius)).unwrap().symbol_radius + 2;
 	for i in 0..items {
 		let field = &fields[i];
 		trace!("Legend field {:?}", field);

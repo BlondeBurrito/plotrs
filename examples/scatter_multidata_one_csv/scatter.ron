@@ -31,8 +31,8 @@ Scatter(
 			name: "Next interesting", // legend will indicate which colour and symbol correspond to which data set
 			colour: Blue, // the colour to render a data point
 			symbol: Circle, // the shape a plotted data point should take
-			symbol_radius: 5, // The size of a drawn symbol in (1+ symbol_radius) pixels
-			symbol_thickness: 2, // The thinkness of a drawn symbol in (1 + symbol_thickness) pixels
+			symbol_radius: 8, // The size of a drawn symbol in (1+ symbol_radius) pixels
+			symbol_thickness: 3, // The thinkness of a drawn symbol in (1 + symbol_thickness) pixels
 		),
 	],
 )

@@ -60,18 +60,17 @@ impl DataSymbol {
 			}
 			DataSymbol::Circle => {
 				pixel_coords.push(origin);
-				let todo = if (radius + 1) & 1 == 1 {
-					radius + 2
-				}else {
-					radius + 1
-				};
-				let mut angles = Vec::new();
-				let segments: u32 = 124;
-				for i in 0..segments {angles.push((2.0 * PI/segments as f32) * i as f32)};
-				for angle in angles.iter() {
-					for n in 0..=thickness {
-						let y = angle.sin() * (radius + 1 + n) as f32;
-						let x = angle.cos() * (radius + 1 + n) as f32;
+				for n in 0..=thickness {
+					// Ensure even radius of circle
+					let r = if (radius + 1) & 1 == 1 {
+						radius + 2 + n
+					}else {
+						radius + 1 + n
+					};
+					let scale_factor: u32 = 1000;
+					for angle_deg in 0..(360 * scale_factor) {
+						let y = (angle_deg as f32 / scale_factor as f32).to_radians().sin() * r as f32;
+						let x = (angle_deg as f32 / scale_factor as f32).to_radians().cos() * r as f32;
 						let delta_x = origin.0 as f32 + x;
 						let delta_y = origin.1 as f32 + y;
 						pixel_coords.push((delta_x as u32, delta_y as u32));
@@ -99,9 +98,9 @@ impl DataSymbol {
 				// Ensure side_length is even otherwise the triangle will have an offset
 				// Initial (radius + 1) ensures that if a user sets radius to zero something will still be drawn
 				let side_length: f32 = if (radius + 1) & 1 == 1 {
-					((radius + 2) as f32 + float_n) * 2.0
+					(radius + 2) as f32 + float_n
 				} else {
-					((radius + 1) as f32 + float_n) * 2.0
+					(radius + 1) as f32 + float_n
 				};
 				let height: f32 = side_length * (3.0_f32.sqrt() / 2.0);
 				let incircle_radius: f32 = side_length / (2.0 * 3.0_f32.sqrt());
