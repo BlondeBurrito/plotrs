@@ -9,6 +9,8 @@
 
 A CLI app for plotting data sets onto a variety of graphs.
 
+## Features
+
 ## Install
 
 `cargo install plotit`
@@ -28,6 +30,12 @@ plotit -g scatter -c examples/scatter/scatter.ron -o examples/scatter
 ```
 
 Note that if your canvas is too small then your title and axis labels may become blurry.
+
+## Graph `.ron` Schemas
+
+## Symbol Types
+
+## Best Fit Schemas
 
 ## Examples
 

@@ -2,7 +2,7 @@
 
 use image::{ImageBuffer, Rgba};
 use serde::Deserialize;
-use tracing::{debug, trace, warn};
+use tracing::{trace, warn};
 
 use crate::colours::Colour;
 

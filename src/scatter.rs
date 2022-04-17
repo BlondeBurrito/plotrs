@@ -2,7 +2,7 @@
 
 use image::{ImageBuffer, Rgba};
 use ron::de::from_reader;
-use serde::Deserialize;
+use serde::{Deserialize, de};
 use std::fs::File;
 use tracing::{debug, error, info};
 
@@ -20,7 +20,7 @@ use crate::{
 		plot::DataPoint,
 		plot::DataSymbol,
 		save_image,
-		title::build_title,
+		title::build_title, best_fit::BestFit,
 	},
 	colours::*,
 	data::load_data,
@@ -72,6 +72,8 @@ struct DataSet {
 	symbol_radius: u32,
 	/// The thinkness of a drawn symbol in (1 + symbol_thickness) pixels
 	symbol_thickness: u32,
+	/// Optional, a type of best fit line to draw
+	best_fit: Option<BestFit>,
 }
 
 /// Creates a canvas and draws the scatter graph over it

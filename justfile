@@ -58,3 +58,4 @@ generate-examples: install
   cd examples/scatter_multidata_two_csv/; plotit.exe -g scatter -c scatter.ron -o .
   cd examples/scatter_error_bars/; plotit.exe -g scatter -c scatter_y.ron -o .
   cd examples/scatter_error_bars/; plotit.exe -g scatter -c scatter_xy.ron -o .
+  cd examples/scatter_full/; plotit.exe -g scatter -c scatter.ron -o .
