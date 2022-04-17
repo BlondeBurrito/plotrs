@@ -1,6 +1,6 @@
 Scatter(
 	title: "Showcasing a Bunch of Cool Features",
-	canvas_pixel_size: (1200, 900),
+	canvas_pixel_size: (1920, 900),
 	x_axis_label: "Time (ms)",
 	x_axis_resolution: 14, // Number of times the x-axis will be divided to show your data scale. Advised to make it a ratio of your largest x value
 	y_axis_label: "Momentum (kgm/s)",
@@ -20,6 +20,7 @@ Scatter(
 			symbol: Square, // the shape a plotted data point should take
 			symbol_radius: 15, // The size of a drawn symbol in (1+ symbol_radius) pixels
 			symbol_thickness: 2, // The thinkness of a drawn symbol in (1 + symbol_thickness) pixels
+			best_fit: Some(Linear(gradient: 1.0, y_intercept: 0.0, colour: Black)), // A curve to fit to the axes. Some(BestFit) or None
 		),
 		DataSet(
 			data_path: "scatter.csv",
@@ -33,6 +34,7 @@ Scatter(
 			symbol: Cross, // the shape a plotted data point should take
 			symbol_radius: 8, // The size of a drawn symbol in (1+ symbol_radius) pixels
 			symbol_thickness: 2, // The thinkness of a drawn symbol in (1 + symbol_thickness) pixels
+			best_fit: None, // A curve to fit to the axes. Some(BestFit) or None
 		),
 	],
 )

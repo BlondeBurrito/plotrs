@@ -124,9 +124,16 @@ fn get_x_axis_label_offset(
 /// X is small as it's drawn from the left hand border based on canvas origin in top right (0,0).
 ///
 /// Y is large as it's the pixel most towrds the bottom left canvas corner, which is far away from the canvas (0, 0) in the top left corner
-pub fn get_xy_axis_pixel_origin(x: u32, vertical_pixels_from_bottom: u32, canvas_size: (u32, u32)) -> (u32, u32) {
+pub fn get_xy_axis_pixel_origin(
+	x: u32,
+	vertical_pixels_from_bottom: u32,
+	canvas_size: (u32, u32),
+) -> (u32, u32) {
 	// ensures at least 10% of the left and bottom canvas is free
-	(x + (canvas_size.0 / 10), vertical_pixels_from_bottom - (canvas_size.1 / 10))
+	(
+		x + (canvas_size.0 / 10),
+		vertical_pixels_from_bottom - (canvas_size.1 / 10),
+	)
 }
 /// Find the pixel pair which pinpoints the maxmium length and height of the axes. Resolutions are
 /// used to ensure that the length of each axis is a natural scale factor of the resolution. This
@@ -165,7 +172,7 @@ pub fn get_xy_axis_pixel_max(
 			break 'outer_y;
 		}
 	}
-	return (x, y)
+	return (x, y);
 }
 /// Get the pixel length of the x-axis
 pub fn get_x_axis_pixel_length(min_pixel: u32, max_pixel: u32) -> u32 {
@@ -264,7 +271,7 @@ fn draw_x_axis_scale_markings(
 		// Draw each even section slightly longer
 		let label_length_scale = if i & 1 == 1 { 2 } else { 3 };
 		for n in 0..(data_label_length * label_length_scale) {
-		// for n in 0..(data_label_length) {
+			// for n in 0..(data_label_length) {
 			canvas.put_pixel(
 				origin_pixel.0 + (i * x_subdivision_length),
 				origin_pixel.1 + n,
@@ -288,11 +295,12 @@ fn draw_x_axis_scale_markings(
 			// (mc + 1) because there needs to be a gap between final mini-marker and scale marker
 			if x_subdivision_length % (mc + 1) == 0 {
 				if i < x_axis_resolution {
-				for j in 1..=*mc {
-					let marker_spacing = x_subdivision_length / (mc + 1);
+					for j in 1..=*mc {
+						let marker_spacing = x_subdivision_length / (mc + 1);
 						for n in 0..data_label_length {
 							canvas.put_pixel(
-								origin_pixel.0 + ((i * x_subdivision_length) + (j * marker_spacing)),
+								origin_pixel.0
+									+ ((i * x_subdivision_length) + (j * marker_spacing)),
 								origin_pixel.1 + n,
 								Rgba(BLACK),
 							);
@@ -416,11 +424,11 @@ fn draw_y_axis_scale_markings(
 			// (mc + 1) because there needs to be a gap between final mini-marker and scale marker
 			if subdivision_length % (mc + 1) == 0 {
 				if i < y_axis_resolution {
-				for j in 1..=*mc {
-					let marker_spacing = subdivision_length / (mc + 1);
+					for j in 1..=*mc {
+						let marker_spacing = subdivision_length / (mc + 1);
 						for n in 0..data_label_length {
 							canvas.put_pixel(
-								origin_pixel.0 -n,
+								origin_pixel.0 - n,
 								origin_pixel.1 - ((i * subdivision_length) + (j * marker_spacing)),
 								Rgba(BLACK),
 							);

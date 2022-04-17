@@ -7,8 +7,8 @@ use font_kit::{
 use log;
 use rusttype::Font;
 use std::fs;
-use tracing;
-use tracing::{debug, error};
+use tracing::{self, trace};
+use tracing::error;
 use tracing_subscriber;
 mod canvas;
 mod colours;
@@ -78,7 +78,7 @@ pub fn get_system_font() -> Font<'static> {
 			path,
 			font_index: _,
 		} => {
-			debug!("Font path: {:?}", path);
+			trace!("Font path: {:?}", path);
 			let bytes = fs::read(path.as_path()).unwrap();
 			match Font::try_from_vec(bytes) {
 				Some(x) => x,

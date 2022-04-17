@@ -2,7 +2,7 @@
 
 use image::{ImageBuffer, Rgba};
 use ron::de::from_reader;
-use serde::{Deserialize, de};
+use serde::Deserialize;
 use std::fs::File;
 use tracing::{debug, error, info};
 
@@ -14,13 +14,14 @@ use crate::{
 			draw_xy_axes, get_x_axis_pixel_length, get_xy_axis_pixel_max, get_xy_axis_pixel_origin,
 			get_y_axis_pixel_length,
 		},
+		best_fit::BestFit,
 		draw_base_canvas,
 		glyphs::FontSizes,
 		legend::{build_legend, LegendField},
 		plot::DataPoint,
 		plot::DataSymbol,
 		save_image,
-		title::build_title, best_fit::BestFit,
+		title::build_title,
 	},
 	colours::*,
 	data::load_data,
@@ -110,7 +111,7 @@ pub fn scatter_builder(path: &str, output: &str, csv_delimiter: &str) {
 		legend_scale_factor,
 		canvas.dimensions(),
 		scatter.x_axis_resolution,
-		scatter.y_axis_resolution
+		scatter.y_axis_resolution,
 	);
 	debug!("Origin axis placement {:?}", axis_min);
 	debug!("Maximun axis placement {:?}", axis_max);
@@ -156,7 +157,7 @@ pub fn scatter_builder(path: &str, output: &str, csv_delimiter: &str) {
 		scatter.x_axis_resolution,
 		scatter.y_axis_resolution,
 	);
-	// optionall build the legend
+	// optionally build the legend
 	if scatter.has_legend {
 		let legend_fields = get_legend_fields(&scatter.data_sets);
 		let legend_origin: (u32, u32) = (axis_max.0, axis_max.1 * 2);
@@ -168,7 +169,19 @@ pub fn scatter_builder(path: &str, output: &str, csv_delimiter: &str) {
 		);
 	}
 	// if a line of best fit has been specified then draw it
-	//TODO: best fit
+	for set in &scatter.data_sets {
+		match &set.best_fit {
+			Some(curve) => {
+				info!("Plotting best fit...");
+				let points = curve.find_coordinates(x_data_min_max_limits.0, x_data_min_max_limits.1, y_data_min_max_limits.0, y_data_min_max_limits.1);
+				let origin_offset = (axis_min.0, axis_min.1);
+				for p in points.iter() {
+					p.draw_point(&mut canvas, x_axis_data_scale_factor, y_axis_data_scale_factor, origin_offset);
+				}
+			},
+			None => {},
+}
+	}
 	// get the csv data content and plot it
 	build_data_points(
 		&scatter.data_sets,
@@ -220,7 +233,7 @@ fn get_data_bounds(data_set: &Vec<DataSet>, csv_delimiter: &str) -> ((f32, f32),
 	let mut max_ux = Some(0.0); // TODO: unused at present
 	let mut max_y = 0.0;
 	let mut max_uy = Some(0.0); // TODO: unused at present
-	// iterate over each set
+							// iterate over each set
 	for set in data_set.iter() {
 		// read the csv each set corresponds to
 		let data = load_data(set.data_path.as_str(), set.has_headers, csv_delimiter);

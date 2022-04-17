@@ -6,10 +6,10 @@ use regex::Regex;
 use tracing::{error, info};
 
 pub mod axes;
+pub mod best_fit;
 pub mod glyphs;
 pub mod legend;
 pub mod plot;
-pub mod best_fit;
 pub mod title;
 
 /// Create a blank canvas which can be mutated with content
