@@ -45,7 +45,13 @@ Based on the dimensions of your image (`canvas_size`) the text and axes position
 
 From single or multiple `csv` files you can plot several data sets onto a single graph. Each data set can be configured to plot with a different colour and/or symbol. The legend can be toggled on and off. The size and thickness of the symbols are configurable on a per data set basis.
 
+From a single `csv` containing multiple columns for different data sets:
+
 <img src="examples/scatter_multidata_one_csv/oh_wow__multiple_data_sets.png" alt="s" width="800"/>
+
+From two `csv` files where each contains a column pair:
+
+<img src="examples/scatter_multidata_two_csv/data_from_two_csv_files_woweeeee.png" alt="s" width="800"/>
 
 ### [Scatter Error Bars](https://github.com/BlondeBurrito/plotit/tree/main/examples/scatter_error_bars)
 

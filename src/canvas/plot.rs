@@ -25,7 +25,13 @@ impl DataSymbol {
 		match self {
 			DataSymbol::Cross => {
 				pixel_coords.push(origin);
-				for i in 0..(radius + 1) {
+				// Ensure even arm lengths
+				let length = if (radius + 1) & 1 == 1 {
+					radius + 2
+				}else {
+					radius + 1
+				};
+				for i in 0..length {
 					// right side of cross
 					pixel_coords.push((origin.0 + i, origin.1));
 					for n in 0..=thickness {
@@ -54,6 +60,11 @@ impl DataSymbol {
 			}
 			DataSymbol::Circle => {
 				pixel_coords.push(origin);
+				let todo = if (radius + 1) & 1 == 1 {
+					radius + 2
+				}else {
+					radius + 1
+				};
 				let mut angles = Vec::new();
 				let segments: u32 = 124;
 				for i in 0..segments {angles.push((2.0 * PI/segments as f32) * i as f32)};
@@ -69,16 +80,90 @@ impl DataSymbol {
 			},
 			DataSymbol::Triangle => {
 				pixel_coords.push(origin);
+				for n in 0..=thickness {
+					let float_n = n as f32;
 				// To draw an equilateral triangle with a corner facing northwards we can 
-				// find the coords of each corner, find 3 equations of a straight line to
+				// find the coords of each corner, find equations of a straight line to
 				// join them up and iterate over the known `x` coord to place the pixels
 				// along each line.
+				//
+				// Find the 3 corner coord from our origin:
+				//
+				// Incircle radius of an equilateral triangle is twice the area divided by the perimiter
+				// area = (side_length * height)/ 2
+				// height = side_length * (3.sqrt() / 2)
+				// perimiter = 3 x side_length
+				// ir = side_length / (2 * 3.sqrt())
+				//
+				// Note our side length is the radius argument
+				// Ensure side_length is even otherwise the triangle will have an offset
+				// Initial (radius + 1) ensures that if a user sets radius to zero something will still be drawn
+				let side_length: f32 = if (radius + 1) & 1 == 1 {
+					((radius + 2) as f32 + float_n) * 2.0
+				} else {
+					((radius + 1) as f32 + float_n) * 2.0
+				};
+				let height: f32 = side_length * (3.0_f32.sqrt() / 2.0);
+				let incircle_radius: f32 = side_length / (2.0 * 3.0_f32.sqrt());
+
 				// The 3 corners
+				// The northwards facing corner is simply the origin plus the (height - incircle_radius)
+				let top: (f32, f32) = (origin.0 as f32, origin.1 as f32 + height - incircle_radius);
+				// The bottom left corner is simply the origin moved left by half the side length and moved down by incircle
+				let left: (f32, f32) = (origin.0 as f32 - (side_length/2.0), origin.1 as f32 - incircle_radius);
+				// The bottom right corner is simply the origin moved right by half the side length and moved down by incircle
+				let right: (f32, f32) = (origin.0 as f32 + (side_length/2.0), origin.1 as f32 - incircle_radius);
+				// Ensure corners are drawn
+				pixel_coords.push((top.0 as u32, top.1 as u32));
+				pixel_coords.push((left.0 as u32, left.1 as u32));
+				pixel_coords.push((right.0 as u32, right.1 as u32));
+
+				// Joining left and right is easy as they are vertically aligned
+				let x_distance_between_left_right = (right.0 - left.0) as u32;
+				for i in 0..x_distance_between_left_right {
+					pixel_coords.push((left.0 as u32 + i, left.1 as u32));
+				}
+
+				// Finding the points to connect left to top we can create an equation of a striahgt line, y = mx + c
+				let gradient_l_t = (top .1 - left.1) / (top.0 - left.0);
+				let intercept_l_t = left.1 - (gradient_l_t * left.0);
+				// Iterate over each X from left to top giving us the Y
+				let left_to_top_delta_x = (top.0 - left.0) as u32;
+				// We modify the actual range to iterate by a scale factor as we cannot iterate over a float
+				// which would allow us to find a contiguous line of points. Without a modifier the f32 conversion
+				// to u32 produces a dotted line
+				let scale_factor = 10000;
+				for i in 0..(left_to_top_delta_x * scale_factor) {
+					let x = left.0 + (i as f32 / scale_factor as f32);
+					let y = (gradient_l_t * x) + intercept_l_t;
+					pixel_coords.push((x as u32, y as u32));
+				}
 				
+				// Finding the points to connect top to right we can create an equation of a striahgt line, y = mx + c
+				let gradient_t_r = (top .1 - right.1) / (top.0 - right.0);
+				let intercept_t_r = right.1 - (gradient_t_r * right.0);
+				// Iterate over each X from top to right giving us the Y
+				let top_to_right_delta_x = (right.0 - top.0) as u32;
+				// We modify the actual range to iterate by a scale factor as we cannot iterate over a float
+				// which would allow us to find a contiguous line of points. Without a modifier the f32 conversion
+				// to u32 produces a dotted line
+				let scale_factor = 10000;
+				for i in 0..(top_to_right_delta_x * scale_factor) {
+					let x = top.0 + (i as f32 / scale_factor as f32);
+					let y = (gradient_t_r * x) + intercept_t_r;
+					pixel_coords.push((x as u32, y as u32));
+				}
+			}
 			},
 			DataSymbol::Square => {
 				pixel_coords.push(origin);
-				for i in 0..(radius + 1) {
+				// Always ensure even to prevent shaoe being offset by 1 pixel
+				let half_side_length = if (radius + 1) & 1 == 1 {
+					radius + 2
+				}else {
+					radius + 1
+				};
+				for i in 0..half_side_length {
 					for n in 0..=thickness {
 						// top right horizontal
 						pixel_coords.push((origin.0 + i + n, origin.1 - radius -n));

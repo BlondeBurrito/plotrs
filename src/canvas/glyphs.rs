@@ -16,6 +16,7 @@ pub struct FontSizes {
 
 impl FontSizes {
 	/// Based on the golden ratio and canvas width generate appropriate font sizes
+	/// inspired from [pearsonified](https://pearsonified.com/golden-ratio-typography-intro/)
 	pub fn new(canvas_pixel_size: &(u32, u32)) -> FontSizes {
 		// using the golden ratio and canvas width calculate the title font size
 		let gr = (1.0 + 5.0_f32.sqrt()) / 2.0;

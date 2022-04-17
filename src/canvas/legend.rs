@@ -59,7 +59,7 @@ pub fn build_legend(
 			match canvas.get_pixel_mut_checked(*px, *py) {
 				Some(pixel) => *pixel = Rgba(Colour::get_pixel_colour(field.colour)),
 				None => warn!(
-					"Cannot plot legend pointwith symbol pixel position ({}, {})",
+					"Cannot plot legend point with symbol pixel position ({}, {})",
 					px, py
 				),
 			}

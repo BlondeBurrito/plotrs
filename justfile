@@ -52,8 +52,9 @@ install:
   cargo install --path .
 
 generate-examples: install
-  cd examples/scatter/; plotit.exe -g scatter -c scatter.ron -o . -v
-  cd examples/scatter_large/; plotit.exe -g scatter -c scatter.ron -o . -v
-  cd examples/scatter_multidata_one_csv/; plotit.exe -g scatter -c scatter.ron -o . -v
-  cd examples/scatter_error_bars/; plotit.exe -g scatter -c scatter_y.ron -o . -v
-  cd examples/scatter_error_bars/; plotit.exe -g scatter -c scatter_xy.ron -o . -v
+  cd examples/scatter/; plotit.exe -g scatter -c scatter.ron -o .
+  cd examples/scatter_large/; plotit.exe -g scatter -c scatter.ron -o .
+  cd examples/scatter_multidata_one_csv/; plotit.exe -g scatter -c scatter.ron -o .
+  cd examples/scatter_multidata_two_csv/; plotit.exe -g scatter -c scatter.ron -o .
+  cd examples/scatter_error_bars/; plotit.exe -g scatter -c scatter_y.ron -o .
+  cd examples/scatter_error_bars/; plotit.exe -g scatter -c scatter_xy.ron -o .
