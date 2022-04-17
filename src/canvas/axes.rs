@@ -262,8 +262,9 @@ fn draw_x_axis_scale_markings(
 	// Draw a line of pixels down from the axis as each subdivisions
 	for i in 0..(x_axis_resolution + 1) {
 		// Draw each even section slightly longer
-		let label_length_scale = if i & 1 == 1 { 1 } else { 2 };
+		let label_length_scale = if i & 1 == 1 { 2 } else { 3 };
 		for n in 0..(data_label_length * label_length_scale) {
+		// for n in 0..(data_label_length) {
 			canvas.put_pixel(
 				origin_pixel.0 + (i * x_subdivision_length),
 				origin_pixel.1 + n,
@@ -275,9 +276,32 @@ fn draw_x_axis_scale_markings(
 		let glyphs = create_glyphs(font_size, &text, &font);
 		let origin_x = origin_pixel.0 + (i * x_subdivision_length);
 		let origin_y = origin_pixel.1 + (data_label_length * label_length_scale);
+		// let origin_y = origin_pixel.1 + (data_label_length);
 		let offset = get_x_axis_scale_label_offset(&glyphs, origin_x, origin_y);
 		trace!("Drawing x-axis label {} at {:?}", text, offset);
 		draw_glyphs(canvas, BLACK, glyphs, offset);
+
+		// If there's enough space between each scale marker create mini-markings
+		// mini-marker varients
+		let marker_count = vec![9, 4, 3, 2, 1];
+		'outer: for mc in marker_count.iter() {
+			// (mc + 1) because there needs to be a gap between final mini-marker and scale marker
+			if x_subdivision_length % (mc + 1) == 0 {
+				if i < x_axis_resolution {
+				for j in 1..=*mc {
+					let marker_spacing = x_subdivision_length / (mc + 1);
+						for n in 0..data_label_length {
+							canvas.put_pixel(
+								origin_pixel.0 + ((i * x_subdivision_length) + (j * marker_spacing)),
+								origin_pixel.1 + n,
+								Rgba(BLACK),
+							);
+						}
+					}
+					break 'outer;
+				}
+			}
+		}
 	}
 }
 
@@ -368,7 +392,7 @@ fn draw_y_axis_scale_markings(
 	// Draw a line of pixels down from the axis as each subdivisions
 	for i in 0..(y_axis_resolution + 1) {
 		// Draw each even section slightly longer
-		let label_length_scale = if i & 1 == 1 { 1 } else { 2 };
+		let label_length_scale = if i & 1 == 1 { 2 } else { 3 };
 		for n in 0..(data_label_length * label_length_scale) {
 			canvas.put_pixel(
 				origin_pixel.0 - n,
@@ -384,6 +408,28 @@ fn draw_y_axis_scale_markings(
 		let offset = get_y_axis_scale_label_offset(&glyphs, origin_x, origin_y);
 		trace!("Drawing y-axis label {} at {:?}", text, offset);
 		draw_glyphs(canvas, BLACK, glyphs, offset);
+
+		// If there's enough space between each scale marker create mini-markings
+		// mini-marker varients
+		let marker_count = vec![9, 4, 3, 2, 1];
+		'outer: for mc in marker_count.iter() {
+			// (mc + 1) because there needs to be a gap between final mini-marker and scale marker
+			if subdivision_length % (mc + 1) == 0 {
+				if i < y_axis_resolution {
+				for j in 1..=*mc {
+					let marker_spacing = subdivision_length / (mc + 1);
+						for n in 0..data_label_length {
+							canvas.put_pixel(
+								origin_pixel.0 -n,
+								origin_pixel.1 - ((i * subdivision_length) + (j * marker_spacing)),
+								Rgba(BLACK),
+							);
+						}
+					}
+					break 'outer;
+				}
+			}
+		}
 	}
 }
 

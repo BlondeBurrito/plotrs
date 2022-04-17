@@ -1,7 +1,5 @@
 //!
 
-use std::f32::consts::PI;
-
 use image::{ImageBuffer, Rgba};
 use serde::Deserialize;
 use tracing::{debug, trace, warn};

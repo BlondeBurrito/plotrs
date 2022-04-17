@@ -1,6 +1,6 @@
 Scatter(
 	title: "Engery against Time for Fuzzing About Things",
-	canvas_pixel_size: (800, 600),
+	canvas_pixel_size: (840, 600),
 	x_axis_label: "Time (ms)",
 	x_axis_resolution: 11, // Number of times the x-axis will be divided to show your data scale. Advised to make it a ratio of your largest x value
 	y_axis_label: "Energy (kJ)",
