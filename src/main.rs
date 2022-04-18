@@ -7,8 +7,8 @@ use font_kit::{
 use log;
 use rusttype::Font;
 use std::fs;
-use tracing::{self, trace};
 use tracing::error;
+use tracing::{self, trace};
 use tracing_subscriber;
 mod canvas;
 mod colours;
