@@ -2,9 +2,9 @@ Scatter(
 	title: "Showcasing a Bunch of Cool Features",
 	canvas_pixel_size: (1920, 900),
 	x_axis_label: "Time (ms)",
-	x_axis_resolution: 14, // Number of times the x-axis will be divided to show your data scale. Advised to make it a ratio of your largest x value
+	x_axis_resolution: 13, // Number of times the x-axis will be divided to show your data scale. Advised to make it a ratio of your largest x value
 	y_axis_label: "Momentum (kgm/s)",
-	y_axis_resolution: 10, // Number of times the y-axis will be divided to show your data scale. Advised to make it a ratio of your largest y value
+	y_axis_resolution: 13, // Number of times the y-axis will be divided to show your data scale. Advised to make it a ratio of your largest y value
 	has_grid: true, // Should the graph have a light grey background grid
 	has_legend: true, // should a legend be generated? Only really useful with multiple data sets
 	data_sets: [
@@ -15,12 +15,12 @@ Scatter(
 			x_axis_error_bar_csv_column: None, // which column contains x uncertainty Some(usize) or None
 			y_axis_csv_column: 1, // which column contains the y values
 			y_axis_error_bar_csv_column: None, // which column contains y uncertainty Some(usize) or None
-			name: "Very interesting", // legend will indicate which colour and symbol correspond to which data set
+			name: "Bunch of data", // legend will indicate which colour and symbol correspond to which data set
 			colour: Red, // the colour to render a data point
 			symbol: Square, // the shape a plotted data point should take
-			symbol_radius: 15, // The size of a drawn symbol in (1+ symbol_radius) pixels
+			symbol_radius: 8, // The size of a drawn symbol in (1+ symbol_radius) pixels
 			symbol_thickness: 2, // The thinkness of a drawn symbol in (1 + symbol_thickness) pixels
-			best_fit: Some(Cubic(intercept: 0.5, linear_coeff: -1.5, quadratic_coeff: 2.0, cubic_coeff: 0.5, colour: Black)), // A curve to fit to the axes. Some(BestFit) or None
+			best_fit: Some(Cubic(intercept: 5.0, linear_coeff: -1.5, quadratic_coeff: -4.0, cubic_coeff: 2.0, colour: Black)), // A curve to fit to the axes. Some(BestFit) or None
 		),
 		DataSet(
 			data_path: "scatter.csv",
@@ -29,7 +29,7 @@ Scatter(
 			x_axis_error_bar_csv_column: None, // which column contains x uncertainty Some(usize) or None
 			y_axis_csv_column: 3, // which column contains the y values
 			y_axis_error_bar_csv_column: None, // which column contains y uncertainty Some(usize) or None
-			name: "Next interesting", // legend will indicate which colour and symbol correspond to which data set
+			name: "Some other data", // legend will indicate which colour and symbol correspond to which data set
 			colour: Blue, // the colour to render a data point
 			symbol: Cross, // the shape a plotted data point should take
 			symbol_radius: 8, // The size of a drawn symbol in (1+ symbol_radius) pixels
