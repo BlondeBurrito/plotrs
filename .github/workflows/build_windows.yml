@@ -36,6 +36,5 @@ jobs:
           command: install
           args: just
       - name: Generate Examples
-        uses: actions/checkout@v2
         run: just generate-examples
         shell: powershell
