@@ -1,7 +1,9 @@
 //!
 
+use std::collections::HashMap;
+
 use serde::Deserialize;
-use tracing::trace;
+use tracing::{trace, error};
 
 use crate::{
 	canvas::plot::{DataPoint, DataSymbol},
@@ -9,7 +11,7 @@ use crate::{
 };
 
 /// Types of curve that cna be fitted to a graph
-#[derive(Debug, Deserialize, Copy, Clone)]
+#[derive(Debug, Deserialize, Clone)]
 pub enum BestFit {
 	/// Equation of a straight line, `y = mx + c`
 	Linear {
@@ -30,6 +32,19 @@ pub enum BestFit {
 		linear_coeff: f32,
 		quadratic_coeff: f32,
 		cubic_coeff: f32,
+		colour: Colour,
+	},
+	/// Equation of form `y = a + bx + cx^2 + dx^3....n`
+	/// 
+	/// Each `HashMap<u32, f32>` key corresponds to an `nth` order power while the value is the coefficient.
+	/// ```txt
+	/// let mut y = 0.0;
+	/// for (k, v) in coefficients.iter() {
+	///     y += v * x.powf(k as f32);
+	/// }
+	/// ```
+	GenericPolynomial {
+		coefficients: HashMap<u32, f32>,
 		colour: Colour,
 	},
 	/// Equation of form `y = an^(bx) + c`
@@ -141,8 +156,36 @@ impl BestFit {
 				}
 				return points
 			},
+			BestFit::GenericPolynomial { coefficients, colour } => {
+				trace!("Finding coordinates for GenericPolynomial best fit line");
+				let mut points: Vec<DataPoint> = Vec::new();
+				for scaled_x in x_min..=(x_max * scale_factor) {
+					let x = scaled_x as f32 / scale_factor as f32;
+					let mut y = 0.0;
+					for (k, v) in coefficients.iter() {
+						y += v * x.powf(*k as f32);
+					}
+					if y > y_min as f32 && y < y_max as f32 {
+						points.push(DataPoint {
+							x: x,
+							ux: None,
+							y: y,
+							uy: None,
+							colour: *colour,
+							symbol: DataSymbol::Point,
+							symbol_radius: 1,
+							symbol_thickness: 1,
+						});
+					}
+				}
+				return points
+			},
 			BestFit::Exponential { constant, base, power, vertical_shift, colour } => {
 				trace!("Finding coordinates for Exponential best fit line with constant {}, base {}, power {} and vertica shift {}", constant, base, power, vertical_shift);
+				if *base <= 0.0 {
+					error!("The base used in an exponential best fit must be greater than zero, you specified {}", base);
+					std::process::exit(1);
+				}
 				let mut points: Vec<DataPoint> = Vec::new();
 				for scaled_x in x_min..=(x_max * scale_factor) {
 					let x = scaled_x as f32 / scale_factor as f32;
@@ -164,6 +207,10 @@ impl BestFit {
 			},
 			BestFit::ExponentialApproach { constant, base, power, vertical_shift, colour } => {
 				trace!("Finding coordinates for ExponentialApproach best fit line with constant {}, base {}, power {} and vertica shift {}", constant, base, power, vertical_shift);
+				if *base <= 0.0 {
+					error!("The base used in an exponential best fit must be greater than zero, you specified {}", base);
+					std::process::exit(1);
+				}
 				let mut points: Vec<DataPoint> = Vec::new();
 				for scaled_x in x_min..=(x_max * scale_factor) {
 					let x = scaled_x as f32 / scale_factor as f32;

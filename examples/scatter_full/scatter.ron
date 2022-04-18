@@ -20,7 +20,7 @@ Scatter(
 			symbol: Square, // the shape a plotted data point should take
 			symbol_radius: 15, // The size of a drawn symbol in (1+ symbol_radius) pixels
 			symbol_thickness: 2, // The thinkness of a drawn symbol in (1 + symbol_thickness) pixels
-			best_fit: Some(Linear(gradient: 1.0, y_intercept: 0.0, colour: Black)), // A curve to fit to the axes. Some(BestFit) or None
+			best_fit: Some(Cubic(intercept: 0.5, linear_coeff: -1.5, quadratic_coeff: 2.0, cubic_coeff: 0.5, colour: Black)), // A curve to fit to the axes. Some(BestFit) or None
 		),
 		DataSet(
 			data_path: "scatter.csv",

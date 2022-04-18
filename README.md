@@ -45,7 +45,17 @@ Note that if your canvas is too small then your title and axis labels may become
 
 ## Best Fit Schemas
 
+Linear
+
 Some(Linear(gradient: 1.0, y_intercept: 0.0, colour: Black))
+
+Quadratic
+
+Some(Quadratic(intercept: 1.0, linear_coeff: 1.5, quadratic_coeff: 1.0, colour: Black))
+
+Cubic
+
+Some(Cubic(intercept: 1.0, linear_coeff: 1.5, quadratic_coeff: 1.0, cubic_coeff: 1.0, colour: Black))
 
 
 ## Examples
