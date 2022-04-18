@@ -45,18 +45,83 @@ Note that if your canvas is too small then your title and axis labels may become
 
 ## Best Fit Schemas
 
-Linear
+### Linear
 
-Some(Linear(gradient: 1.0, y_intercept: 0.0, colour: Black))
+```rust
+y = gradient * x + y_intercept
+```
 
-Quadratic
+`Some(Linear(gradient: 1.0, y_intercept: 0.0, colour: Black))`
 
-Some(Quadratic(intercept: 1.0, linear_coeff: 1.5, quadratic_coeff: 1.0, colour: Black))
+<img src="examples/scatter_best_fit/linear_best_fit.png" alt="s" width="210"/>
 
-Cubic
+### Quadratic
 
-Some(Cubic(intercept: 1.0, linear_coeff: 1.5, quadratic_coeff: 1.0, cubic_coeff: 1.0, colour: Black))
+```rust
+y = intercept + (linear_coeff * x) + (quadratic_coeff * x.powf(2))
+```
 
+`Some(Quadratic(intercept: 1.0, linear_coeff: 1.0, quadratic_coeff: 2.0, colour: Black))`
+
+<img src="examples/scatter_best_fit/quadratic_best_fit.png" alt="s" width="210"/>
+
+### Cubic
+
+```rust
+y = intercept + (linear_coeff * x) + (quadratic_coeff * x.powf(2)) + + (cubic_coeff * x.powf(3))
+```
+
+`Some(Cubic(intercept: 1.0, linear_coeff: -0.5, quadratic_coeff: 1.0, cubic_coeff: 1.0, colour: Black))`
+
+<img src="examples/scatter_best_fit/cubic_best_fit.png" alt="s" width="210"/>
+
+### Generic Polynomial
+
+For custom polynomials you supply a map of coefficients where each key is the `nth` power `x` will be raised by and the value is the coefficient it'll be multiplied by.
+
+Roughly:
+
+```rust
+for (k, v) in coefficients.iter() {
+	y += v * x.powf(k);
+}
+```
+
+The following extends the Cubic best fit into a Quartic Polynomial:
+
+`Some(GenericPolynomial(coefficients: {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: -1.0}, colour: Black))`
+
+<img src="examples/scatter_best_fit/generic_polynomial_best_fit.png" alt="s" width="210"/>
+
+### Exponential
+
+```rust
+y = (constant * base.powf(power * x)) + vertical_shift;
+```
+
+`Some(Exponential(constant: 0.5, base: 2.7, power: -1.0, vertical_shift: 3.0, colour: Black))`
+
+<img src="examples/scatter_best_fit/exponential_best_fit.png" alt="s" width="210"/>
+
+### Sinusoidal
+
+```rust
+y = amplitude * ((period * x) + phase_shift).sin() + vertical_shift;
+```
+
+`Some(Sine(amplitude: 2.0, period: 1.0, phase_shift: 0.0, vertical_shift: 3.0, colour: Black))`
+
+<img src="examples/scatter_best_fit/sinusoidal_best_fit.png" alt="s" width="210"/>
+
+### Cosinusoidal
+
+```rust
+y = amplitude * ((period * x) + phase_shift).cos() + vertical_shift;
+```
+
+`Some(Cosine(amplitude: 2.0, period: 1.0, phase_shift: 0.0, vertical_shift: 3.0, colour: Black))`
+
+<img src="examples/scatter_best_fit/cosinusoidal_best_fit.png" alt="s" width="210"/>
 
 ## Examples
 

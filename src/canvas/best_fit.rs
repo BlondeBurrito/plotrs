@@ -55,14 +55,14 @@ pub enum BestFit {
 		vertical_shift: f32,
 		colour: Colour,
 	},
-	/// Equation of form `y = a(1 - n^(-bx)) + c`
-	ExponentialApproach {
-		constant: f32,
-		base: f32,
-		power: f32,
-		vertical_shift: f32,
-		colour: Colour,
-	},
+	// /// Equation of form `y = a(1 - n^(-bx)) + c`
+	// ExponentialApproach {
+	// 	constant: f32,
+	// 	base: f32,
+	// 	power: f32,
+	// 	vertical_shift: f32,
+	// 	colour: Colour,
+	// },
 	/// Equation of form `y = a * sin(bx + c) + d`
 	/// 
 	/// `y = amplitude * sin( period * x + phase_shift) + vertical_shift`
@@ -189,7 +189,7 @@ impl BestFit {
 				let mut points: Vec<DataPoint> = Vec::new();
 				for scaled_x in x_min..=(x_max * scale_factor) {
 					let x = scaled_x as f32 / scale_factor as f32;
-					let y = constant * base.powf(power * x) + vertical_shift;
+					let y = (constant * base.powf(power * x)) + vertical_shift;
 					if y > y_min as f32 && y < y_max as f32 {
 						points.push(DataPoint {
 							x: x,
@@ -205,31 +205,31 @@ impl BestFit {
 				}
 				return points
 			},
-			BestFit::ExponentialApproach { constant, base, power, vertical_shift, colour } => {
-				trace!("Finding coordinates for ExponentialApproach best fit line with constant {}, base {}, power {} and vertica shift {}", constant, base, power, vertical_shift);
-				if *base <= 0.0 {
-					error!("The base used in an exponential best fit must be greater than zero, you specified {}", base);
-					std::process::exit(1);
-				}
-				let mut points: Vec<DataPoint> = Vec::new();
-				for scaled_x in x_min..=(x_max * scale_factor) {
-					let x = scaled_x as f32 / scale_factor as f32;
-					let y = constant * (1.0 - base.powf(-power * x)) + vertical_shift;
-					if y > y_min as f32 && y < y_max as f32 {
-						points.push(DataPoint {
-							x: x,
-							ux: None,
-							y: y,
-							uy: None,
-							colour: *colour,
-							symbol: DataSymbol::Point,
-							symbol_radius: 1,
-							symbol_thickness: 1,
-						});
-					}
-				}
-				return points
-			},
+			// BestFit::ExponentialApproach { constant, base, power, vertical_shift, colour } => {
+			// 	trace!("Finding coordinates for ExponentialApproach best fit line with constant {}, base {}, power {} and vertica shift {}", constant, base, power, vertical_shift);
+			// 	if *base <= 0.0 {
+			// 		error!("The base used in an exponential best fit must be greater than zero, you specified {}", base);
+			// 		std::process::exit(1);
+			// 	}
+			// 	let mut points: Vec<DataPoint> = Vec::new();
+			// 	for scaled_x in x_min..=(x_max * scale_factor) {
+			// 		let x = scaled_x as f32 / scale_factor as f32;
+			// 		let y = constant * (1.0 - base.powf(-power * x)) + vertical_shift;
+			// 		if y > y_min as f32 && y < y_max as f32 {
+			// 			points.push(DataPoint {
+			// 				x: x,
+			// 				ux: None,
+			// 				y: y,
+			// 				uy: None,
+			// 				colour: *colour,
+			// 				symbol: DataSymbol::Point,
+			// 				symbol_radius: 1,
+			// 				symbol_thickness: 1,
+			// 			});
+			// 		}
+			// 	}
+			// 	return points
+			// },
 			BestFit::Sine { amplitude, period, phase_shift, vertical_shift, colour } => {
 				trace!("Finding coordinates for Sinusoidal best fit line with amplitude {}, period {}, phase shift {} and vertical shift {}", amplitude, period, phase_shift, vertical_shift);
 				let mut points: Vec<DataPoint> = Vec::new();
