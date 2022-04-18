@@ -8,12 +8,10 @@
 todo: license
 todo: circle weirdness
 todo: negative axes
-todo: example for each best fit
-todo: revisit expotential approach, check growth and decay funcs
 
 # plotit
 
-A CLI app for plotting data sets onto a variety of graphs.
+A CLI app for plotting csv data sets onto a graph.
 
 <img src="examples/scatter_full/showcasing_a_bunch_of_cool_features.png" alt="s" width="800"/>
 
