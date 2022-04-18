@@ -53,19 +53,19 @@ doc-coverage:
 # install the crate from the local source rather than remote
 install:
   cargo install --path .
-
-generate-examples: install
-  cd examples/scatter/; plotrs -g scatter -c scatter.ron -o .
-  cd examples/scatter_large/; plotrs -g scatter -c scatter.ron -o .
-  cd examples/scatter_multidata_one_csv/; plotrs -g scatter -c scatter.ron -o .
-  cd examples/scatter_multidata_two_csv/; plotrs -g scatter -c scatter.ron -o .
-  cd examples/scatter_error_bars/; plotrs -g scatter -c scatter_y.ron -o .
-  cd examples/scatter_error_bars/; plotrs -g scatter -c scatter_xy.ron -o .
-  cd examples/scatter_best_fit/; plotrs -g scatter -c linear.ron -o .
-  cd examples/scatter_best_fit/; plotrs -g scatter -c quadratic.ron -o .
-  cd examples/scatter_best_fit/; plotrs -g scatter -c cubic.ron -o .
-  cd examples/scatter_best_fit/; plotrs -g scatter -c polynomial.ron -o .
-  cd examples/scatter_best_fit/; plotrs -g scatter -c exponential.ron -o .
-  cd examples/scatter_best_fit/; plotrs -g scatter -c sin.ron -o .
-  cd examples/scatter_best_fit/; plotrs -g scatter -c cos.ron -o .
-  cd examples/scatter_full/; plotrs -g scatter -c scatter.ron -o .
+# generates the example images
+generate-examples +VERBOSE='-v': install
+  cd examples/scatter/; plotrs -g scatter -c scatter.ron -o . {{VERBOSE}}
+  cd examples/scatter_large/; plotrs -g scatter -c scatter.ron -o . {{VERBOSE}}
+  cd examples/scatter_multidata_one_csv/; plotrs -g scatter -c scatter.ron -o . {{VERBOSE}}
+  cd examples/scatter_multidata_two_csv/; plotrs -g scatter -c scatter.ron -o . {{VERBOSE}}
+  cd examples/scatter_error_bars/; plotrs -g scatter -c scatter_y.ron -o . {{VERBOSE}}
+  cd examples/scatter_error_bars/; plotrs -g scatter -c scatter_xy.ron -o . {{VERBOSE}}
+  cd examples/scatter_best_fit/; plotrs -g scatter -c linear.ron -o . {{VERBOSE}}
+  cd examples/scatter_best_fit/; plotrs -g scatter -c quadratic.ron -o . {{VERBOSE}}
+  cd examples/scatter_best_fit/; plotrs -g scatter -c cubic.ron -o . {{VERBOSE}}
+  cd examples/scatter_best_fit/; plotrs -g scatter -c polynomial.ron -o . {{VERBOSE}}
+  cd examples/scatter_best_fit/; plotrs -g scatter -c exponential.ron -o . {{VERBOSE}}
+  cd examples/scatter_best_fit/; plotrs -g scatter -c sin.ron -o . {{VERBOSE}}
+  cd examples/scatter_best_fit/; plotrs -g scatter -c cos.ron -o . {{VERBOSE}}
+  cd examples/scatter_full/; plotrs -g scatter -c scatter.ron -o . {{VERBOSE}}

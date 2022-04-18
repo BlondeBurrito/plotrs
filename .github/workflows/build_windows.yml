@@ -36,5 +36,5 @@ jobs:
           command: install
           args: just
       - name: Generate Examples
-        run: just generate-examples
+        run: just generate-examples -vv
         shell: powershell
