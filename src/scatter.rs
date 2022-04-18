@@ -173,7 +173,7 @@ pub fn scatter_builder(path: &str, output: &str, csv_delimiter: &str) {
 		match &set.best_fit {
 			Some(curve) => {
 				info!("Plotting best fit...");
-				let points = curve.find_coordinates(x_data_min_max_limits.0, x_data_min_max_limits.1, y_data_min_max_limits.0, y_data_min_max_limits.1);
+				let points = curve.find_coordinates(x_data_min_max_limits.0, x_data_min_max_limits.1, y_data_min_max_limits.0, y_data_min_max_limits.1, scatter.canvas_pixel_size.0);
 				let origin_offset = (axis_min.0, axis_min.1);
 				for p in points.iter() {
 					p.draw_point(&mut canvas, x_axis_data_scale_factor, y_axis_data_scale_factor, origin_offset);

@@ -5,9 +5,17 @@
 [![MIT/Apache 2.0](https://img.shields.io/badge/license-MIT%2FApache-blue.svg)](./LICENSE)
 [![Crates.io](https://img.shields.io/crates/d/plotit.svg)](https://crates.io/crates/plotit)
 
+todo: license
+todo: circle weirdness
+todo: negative axes
+todo: example for each best fit
+todo: revisit expotential approach, check growth and decay funcs
+
 # plotit
 
 A CLI app for plotting data sets onto a variety of graphs.
+
+<img src="examples/scatter_full/showcasing_a_bunch_of_cool_features.png" alt="s" width="800"/>
 
 ## Features
 
@@ -36,6 +44,9 @@ Note that if your canvas is too small then your title and axis labels may become
 ## Symbol Types
 
 ## Best Fit Schemas
+
+Some(Linear(gradient: 1.0, y_intercept: 0.0, colour: Black))
+
 
 ## Examples
 
