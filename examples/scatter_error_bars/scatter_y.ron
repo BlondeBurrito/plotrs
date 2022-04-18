@@ -21,6 +21,7 @@ Scatter(
 			symbol: Point, // the shape a plotted data point should take
 			symbol_radius: 3, // The size of a drawn symbol in (1+ symbol_radius) pixels
 			symbol_thickness: 1, // The thinkness of a drawn symbol in (1 + symbol_thickness) pixels
+			best_fit: None, // A curve to fit to the axes. Some(BestFit) or None
 		),
 	],
 )

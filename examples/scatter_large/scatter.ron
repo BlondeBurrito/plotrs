@@ -20,6 +20,7 @@ Scatter(
 			symbol: Cross, // the shape a plotted data point should take
 			symbol_radius: 5, // The size of a drawn symbol in (1+ symbol_radius) pixels
 			symbol_thickness: 2, // The thinkness of a drawn symbol in (1 + symbol_thickness) pixels
+			best_fit: None, // A curve to fit to the axes. Some(BestFit) or None
 		),
 	],
 )

@@ -5,10 +5,6 @@
 [![MIT/Apache 2.0](https://img.shields.io/badge/license-MIT%2FApache-blue.svg)](./LICENSE)
 [![Crates.io](https://img.shields.io/crates/d/plotit.svg)](https://crates.io/crates/plotit)
 
-todo: license
-todo: circle weirdness
-todo: negative axes
-
 # plotit
 
 A CLI app for plotting csv data sets onto a graph.
@@ -39,7 +35,47 @@ Note that if your canvas is too small then your title and axis labels may become
 
 ## Graph `.ron` Schemas
 
+### Scatter Definition
+
+```rust
+Scatter(
+	title: "Engery against Time for Fuzzing About Things",
+	canvas_pixel_size: (840, 600),
+	x_axis_label: "Time (ms)",
+	x_axis_resolution: 11, // Number of times the x-axis will be divided to show your data scale
+	y_axis_label: "Energy (kJ)",
+	y_axis_resolution: 11, // Number of times the y-axis will be divided to show your data scale
+	has_grid: false, // Should the graph have a light grey background grid
+	has_legend: false, // should a legend be generated? Only really useful with multiple data sets
+	// data sets can be sourced from the same csv or from different ones and each can be configured with different colours/symbols
+	data_sets: [
+		DataSet(
+			data_path: "scatter.csv",
+			has_headers: true, // if your data has headers set to `true` so they can be ignored
+			x_axis_csv_column: 0, // which column contains the x values
+			x_axis_error_bar_csv_column: None, // which column contains x uncertainty Some(usize) or None
+			y_axis_csv_column: 1, // which column contains the y values
+			y_axis_error_bar_csv_column: None, // which column contains y uncertainty Some(usize) or None
+			name: "Very interesting", // legend will indicate which colour and symbol correspond to which data set
+			colour: Orange, // the colour to render a data point
+			symbol: Cross, // the shape a plotted data point should take
+			symbol_radius: 5, // The size of a drawn symbol in (1+ symbol_radius) pixels
+			symbol_thickness: 0, // The thinkness of a drawn symbol in (1 + symbol_thickness) pixels
+			best_fit: None, // A curve to fit to the axes. Some(BestFit) or None
+		),
+	],
+)
+```
+
 ## Symbol Types
+
+The following symbols can be used for plotted data points:
+
+* Cross
+* Circle
+* Triangle
+* Square
+* Point
 
 ## Best Fit Schemas
 
@@ -153,6 +189,10 @@ You can also indicate uncertainty with the use of error bars which can be specif
 <img src="examples/scatter_error_bars/we_have_some_certainty_in_x_and_y.png" alt="s" width="800"/>
 
 ## Contributing
+
+* Fork it
+* Tippy tap your keyboard
+* Submit a PR
 
 ## LICENSE
 

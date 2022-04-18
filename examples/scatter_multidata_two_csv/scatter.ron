@@ -20,6 +20,7 @@ Scatter(
 			symbol: Triangle, // the shape a plotted data point should take
 			symbol_radius: 14, // The size of a drawn symbol in (1+ symbol_radius) pixels
 			symbol_thickness: 2, // The thinkness of a drawn symbol in (1 + symbol_thickness) pixels
+			best_fit: None, // A curve to fit to the axes. Some(BestFit) or None
 		),
 		DataSet(
 			data_path: "scatter2.csv",
@@ -33,6 +34,7 @@ Scatter(
 			symbol: Square, // the shape a plotted data point should take
 			symbol_radius: 7, // The size of a drawn symbol in (1+ symbol_radius) pixels
 			symbol_thickness: 2, // The thinkness of a drawn symbol in (1 + symbol_thickness) pixels
+			best_fit: None, // A curve to fit to the axes. Some(BestFit) or None
 		),
 	],
 )
