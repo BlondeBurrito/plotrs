@@ -2,9 +2,9 @@ Scatter(
 	title: "Data From Two Csv Files Woweeeee",
 	canvas_pixel_size: (1920, 1080),
 	x_axis_label: "Time (ms)",
-	x_axis_resolution: 14, // Number of times the x-axis will be divided to show your data scale. Advised to make it a ratio of your largest x value
+	x_axis_resolution: 13, // Number of times the x-axis will be divided to show your data scale. Advised to make it a ratio of your largest x value
 	y_axis_label: "Current (mA)",
-	y_axis_resolution: 10, // Number of times the y-axis will be divided to show your data scale. Advised to make it a ratio of your largest y value
+	y_axis_resolution: 26, // Number of times the y-axis will be divided to show your data scale. Advised to make it a ratio of your largest y value
 	has_grid: true, // Should the graph have a light grey background grid
 	has_legend: true, // should a legend be generated? Only really useful with multiple data sets
 	data_sets: [
