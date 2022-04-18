@@ -1,7 +1,7 @@
 # Scatter
 
-Plots simple scatter chart that has multiple data sets in one csv. During development run the following to tr it out:
+Loading mutliple data sets from a single csv file. During development run the following to try it out:
 
 ```bash
-./target/release/plotit.exe -g scatter -c examples/scatter_multidata_one_csv/scatter.ron -o examples/scatter_multidata_one_csv
+plotrs -g scatter -c scatter.ron -o .
 ```

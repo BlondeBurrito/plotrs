@@ -55,17 +55,17 @@ install:
   cargo install --path .
 
 generate-examples: install
-  cd examples/scatter/; plotit -g scatter -c scatter.ron -o .
-  cd examples/scatter_large/; plotit -g scatter -c scatter.ron -o .
-  cd examples/scatter_multidata_one_csv/; plotit -g scatter -c scatter.ron -o .
-  cd examples/scatter_multidata_two_csv/; plotit -g scatter -c scatter.ron -o .
-  cd examples/scatter_error_bars/; plotit -g scatter -c scatter_y.ron -o .
-  cd examples/scatter_error_bars/; plotit -g scatter -c scatter_xy.ron -o .
-  cd examples/scatter_best_fit/; plotit -g scatter -c linear.ron -o .
-  cd examples/scatter_best_fit/; plotit -g scatter -c quadratic.ron -o .
-  cd examples/scatter_best_fit/; plotit -g scatter -c cubic.ron -o .
-  cd examples/scatter_best_fit/; plotit -g scatter -c polynomial.ron -o .
-  cd examples/scatter_best_fit/; plotit -g scatter -c exponential.ron -o .
-  cd examples/scatter_best_fit/; plotit -g scatter -c sin.ron -o .
-  cd examples/scatter_best_fit/; plotit -g scatter -c cos.ron -o .
-  cd examples/scatter_full/; plotit -g scatter -c scatter.ron -o .
+  cd examples/scatter/; plotrs -g scatter -c scatter.ron -o .
+  cd examples/scatter_large/; plotrs -g scatter -c scatter.ron -o .
+  cd examples/scatter_multidata_one_csv/; plotrs -g scatter -c scatter.ron -o .
+  cd examples/scatter_multidata_two_csv/; plotrs -g scatter -c scatter.ron -o .
+  cd examples/scatter_error_bars/; plotrs -g scatter -c scatter_y.ron -o .
+  cd examples/scatter_error_bars/; plotrs -g scatter -c scatter_xy.ron -o .
+  cd examples/scatter_best_fit/; plotrs -g scatter -c linear.ron -o .
+  cd examples/scatter_best_fit/; plotrs -g scatter -c quadratic.ron -o .
+  cd examples/scatter_best_fit/; plotrs -g scatter -c cubic.ron -o .
+  cd examples/scatter_best_fit/; plotrs -g scatter -c polynomial.ron -o .
+  cd examples/scatter_best_fit/; plotrs -g scatter -c exponential.ron -o .
+  cd examples/scatter_best_fit/; plotrs -g scatter -c sin.ron -o .
+  cd examples/scatter_best_fit/; plotrs -g scatter -c cos.ron -o .
+  cd examples/scatter_full/; plotrs -g scatter -c scatter.ron -o .

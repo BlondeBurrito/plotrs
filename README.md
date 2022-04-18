@@ -1,34 +1,39 @@
-![linux](https://github.com/BlondeBurrito/plotit/actions/workflows/build_linux.yml/badge.svg)
-![windows](https://github.com/BlondeBurrito/plotit/actions/workflows/build_windows.yml/badge.svg)
-[![crates.io](https://img.shields.io/crates/v/plotit.svg)](https://crates.io/crates/plotit)
-[![docs](https://img.shields.io/badge/docs-docs.rs-orange.svg)](https://docs.rs/plotit)
+![linux](https://github.com/BlondeBurrito/plotrs/actions/workflows/build_linux.yml/badge.svg)
+![windows](https://github.com/BlondeBurrito/plotrs/actions/workflows/build_windows.yml/badge.svg)
+[![crates.io](https://img.shields.io/crates/v/plotrs.svg)](https://crates.io/crates/plotrs)
+[![docs](https://img.shields.io/badge/docs-docs.rs-orange.svg)](https://docs.rs/plotrs)
 [![MIT/Apache 2.0](https://img.shields.io/badge/license-MIT%2FApache-blue.svg)](./LICENSE)
-[![Crates.io](https://img.shields.io/crates/d/plotit.svg)](https://crates.io/crates/plotit)
+[![Crates.io](https://img.shields.io/crates/d/plotrs.svg)](https://crates.io/crates/plotrs)
 
-# plotit
+# plotrs
 
-A CLI app for plotting csv data sets onto a graph.
+A CLI app for plotting csv data sets onto a graph. It works by reading a graph definition from a `.ron` file, then extracts data from one or more csv files and produces a `.png` image.
 
 <img src="examples/scatter_full/showcasing_a_bunch_of_cool_features.png" alt="s" width="800"/>
 
 ## Features
 
+* Overlay best fit curves onto your graph
+* Graph element/component positions and sizes are dynamically calculated based on the size of the image you want
+* Multiple colours and symbols can be used to plot data sets
+* Data can be sourced from one or more csv files - you're simply targeting certain columns in a given file for extraction
+
 ## Install
 
-`cargo install plotit`
+`cargo install plotrs`
 
 ## How To Use
 
-Controls formatting settings. I have a prefernce for using tabs simply because in shared projects individuals have their own preference for indentation depth and so automatic tab resizing can make a code base gentler on the eyes.
+Create a `.ron` file containing the configuration of your desired chart and generate a `png` with:
 
 ```bash
-plotit -g <graph_type> -c <path_to_config_ron_file> -o <dir_for_output_png>
+plotrs -g <graph_type> -c <path_to_config_ron_file> -o <dir_for_output_png>
 ```
 
 E.g
 
 ```bash
-plotit -g scatter -c examples/scatter/scatter.ron -o examples/scatter
+plotrs -g scatter -c scatter_config.ron -o here/please
 ```
 
 Note that if your canvas is too small then your title and axis labels may become blurry.
@@ -159,17 +164,17 @@ y = amplitude * ((period * x) + phase_shift).cos() + vertical_shift;
 
 ## Examples
 
-### [Simple Scatter](https://github.com/BlondeBurrito/plotit/tree/main/examples/scatter)
+### [Simple Scatter](https://github.com/BlondeBurrito/plotrs/tree/main/examples/scatter)
 
 <img src="examples/scatter/engery_against_time_for_fuzzing_about_things.png" alt="s" width="400"/>
 
-### [Image Size Scales Elements Dynamically](https://github.com/BlondeBurrito/plotit/tree/main/examples/scatter_large)
+### [Image Size Scales Elements Dynamically](https://github.com/BlondeBurrito/plotrs/tree/main/examples/scatter_large)
 
 Based on the dimensions of your image (`canvas_size`) the text and axes positions are automatically calculated. You can also toggle a light grey background grid drawn the from axes scales.
 
 <img src="examples/scatter_large/a_large_graph_for_testing_positions_of_graph_elements_and_stuff.png" alt="s" width="800"/>
 
-### [Scatter Multidata](https://github.com/BlondeBurrito/plotit/tree/main/examples/scatter_multidata_one_csv)
+### [Scatter Multidata](https://github.com/BlondeBurrito/plotrs/tree/main/examples/scatter_multidata_one_csv)
 
 From single or multiple `csv` files you can plot several data sets onto a single graph. Each data set can be configured to plot with a different colour and/or symbol. The legend can be toggled on and off. The size and thickness of the symbols are configurable on a per data set basis.
 
@@ -181,7 +186,7 @@ From two `csv` files where each contains a column pair:
 
 <img src="examples/scatter_multidata_two_csv/data_from_two_csv_files_woweeeee.png" alt="s" width="800"/>
 
-### [Scatter Error Bars](https://github.com/BlondeBurrito/plotit/tree/main/examples/scatter_error_bars)
+### [Scatter Error Bars](https://github.com/BlondeBurrito/plotrs/tree/main/examples/scatter_error_bars)
 
 You can also indicate uncertainty with the use of error bars which can be specified for either axes.
 
@@ -196,4 +201,10 @@ You can also indicate uncertainty with the use of error bars which can be specif
 
 ## LICENSE
 
-[Dual license of MIT and Apache](https://github.com/BlondeBurrito/plotit/blob/main/LICENSE).
+[Dual license of MIT and Apache](https://github.com/BlondeBurrito/plotrs/blob/main/LICENSE).
+
+## TODO
+
+* Negative axes
+* Show BestFit types in legend
+* Allow overriding font

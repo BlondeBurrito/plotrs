@@ -1,7 +1,13 @@
 # Scatter
 
-Plots simple scatter chart. During development run the following to tr it out:
+A variety of best fit lines. During development run the following to try it out:
 
 ```bash
-./target/release/plotit.exe -g scatter -c examples/scatter/scatter.ron -o examples/scatter
+plotrs -g scatter -c linear.ron -o .
+plotrs -g scatter -c quadratic.ron -o .
+plotrs -g scatter -c cubic.ron -o .
+plotrs -g scatter -c polynomial.ron -o .
+plotrs -g scatter -c exponential.ron -o .
+plotrs -g scatter -c sin.ron -o .
+plotrs -g scatter -c cos.ron -o .
 ```

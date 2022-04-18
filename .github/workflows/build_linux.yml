@@ -30,3 +30,12 @@ jobs:
         with:
           command: build
           args: --release
+      - name: Install Just
+        uses: actions-rs/cargo@v1
+        with:
+          command: install
+          args: just
+      - name: Generate Examples
+        uses: actions/checkout@v2
+        run: just generate-examples
+        shell: bash

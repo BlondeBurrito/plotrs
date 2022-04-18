@@ -1,7 +1,8 @@
 # Scatter
 
-Plots simple scatter chart. During development run the following to tr it out:
+Error bar examples. During development run the following to try it out:
 
 ```bash
-./target/release/plotit.exe -g scatter -c examples/scatter/scatter.ron -o examples/scatter
+plotrs -g scatter -c scatter_y.ron -o .
+plotrs -g scatter -c scatter_xy.ron -o .
 ```
