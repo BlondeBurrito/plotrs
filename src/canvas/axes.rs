@@ -4,120 +4,67 @@ use image::{DynamicImage, GenericImage, ImageBuffer, Rgba};
 use rusttype::PositionedGlyph;
 use tracing::{debug, error, trace};
 
-use crate::{colours::*, get_system_font};
+use crate::{colours::*, get_system_font, canvas::{glyphs::{get_maximum_height_of_glyphs, get_width_of_glyphs}, CANVAS_BORDER_PIXELS}};
 
-use super::glyphs::{create_glyphs, draw_glyphs};
+use super::{glyphs::{create_glyphs, draw_glyphs}, quadrants::Quadrants};
 
-/// Draws the y-axis label onto the canvas, returns how much horizontal space has been occupied from the left-hand side of the canvas edge
+/// Draws the y-axis label onto the canvas, returns how much vertical space has been occupied from the top of the canvas with a buffer of border space
 pub fn build_y_axis_label(
 	canvas: &mut ImageBuffer<Rgba<u8>, Vec<u8>>,
 	label: String,
 	font_size: f32,
+	quadrants: &Quadrants,
+	vertical_pixels_used_by_title: u32,
 ) -> u32 {
 	let font = get_system_font();
-	let axis_glyphs: Vec<PositionedGlyph> = create_glyphs(font_size, label.as_str(), &font);
-	// as the glphs are drawn horizontally we draw them onto a new canvas where its width matches the main canvas' height
-	// we can then rotate this new canvas and copy it onto the main canvas so that the y-axis label appears vertical and aligned to the left
-	let mut rotated_canvas =
-		DynamicImage::new_rgba8(canvas.dimensions().1, canvas.dimensions().0).to_rgba8();
-	let offset = get_y_axis_label_offset(&axis_glyphs, rotated_canvas.dimensions().0);
-	draw_glyphs(&mut rotated_canvas, BLACK, axis_glyphs, offset);
-	// rotate the canvas so its dimensions are aligned to the main canvas
-	let aligned_canvas = DynamicImage::ImageRgba8(rotated_canvas).rotate270();
-	// copy the canvas containing the text onto the main canvas
-	match canvas.copy_from(&aligned_canvas, 0, 0) {
-		Ok(_) => (),
-		Err(e) => {
-			error!("Unable to draw y-axis label: {}", e);
-			std::process::exit(1);
-		}
+	let glyphs: Vec<PositionedGlyph> = create_glyphs(font_size, label.as_str(), &font);
+	let width = get_width_of_glyphs(&glyphs);
+	let height = get_maximum_height_of_glyphs(&glyphs);
+	match quadrants {
+		Quadrants::RightPair => todo!(),
+		Quadrants::LeftPair => todo!(),
+		Quadrants::TopPair => todo!(),
+		Quadrants::BottomPair => todo!(),
+		Quadrants::AllQuadrants => todo!(),
+		Quadrants::TopRight => {
+			debug!("Placing y-axis label in top left corner");
+			let position: (u32, u32) = (CANVAS_BORDER_PIXELS, vertical_pixels_used_by_title);
+			draw_glyphs(canvas, BLACK, glyphs, position);
+			return vertical_pixels_used_by_title + height + CANVAS_BORDER_PIXELS
+		},
+		Quadrants::TopLeft => todo!(),
+		Quadrants::BottomRight => todo!(),
+		Quadrants::BottomLeft => todo!(),
 	}
-	// return offset height as the rotated width offset
-	return offset.1;
-}
-/// Using glyph sizes calculate by how much the axis label should be offset from the origin
-fn get_y_axis_label_offset(glyphs: &Vec<PositionedGlyph>, canvas_width: u32) -> (u32, u32) {
-	let width = {
-		let min_x = glyphs
-			.first()
-			.map(|g| g.pixel_bounding_box().unwrap().min.x)
-			.unwrap();
-		let max_x = glyphs
-			.last()
-			.map(|g| g.pixel_bounding_box().unwrap().max.x)
-			.unwrap();
-		(max_x - min_x) as u32
-	};
-	let height = {
-		let min_y = glyphs
-			.first()
-			.map(|g| g.pixel_bounding_box().unwrap().min.y)
-			.unwrap();
-		let max_y = glyphs
-			.last()
-			.map(|g| g.pixel_bounding_box().unwrap().max.y)
-			.unwrap();
-		(max_y - min_y) as u32
-	};
-	debug!("Y-axis label width: {}", width);
-	debug!("Y-axis label height: {}", height);
-	let horizontal_position = (canvas_width / 2) - (width / 2);
-	debug!("Y-axis horizontal offset: {}", horizontal_position);
-	let vertical_postion = height as u32;
-	debug!("Y-axis vertical offset: {}", vertical_postion);
-	return (horizontal_position, vertical_postion);
 }
 
-/// Draws the x-axis label onto the canvas, returns the amount of vertical pixel space occupied from the bottom border
+/// Draws the x-axis label onto the canvas, returns the amount of vertical pixel space occupied from the bottom border with a buffer of border space
 pub fn build_x_axis_label(
 	canvas: &mut ImageBuffer<Rgba<u8>, Vec<u8>>,
 	label: String,
 	font_size: f32,
+	quadrants: &Quadrants,
 ) -> u32 {
 	let font = get_system_font();
-	let axis_glyphs: Vec<PositionedGlyph> = create_glyphs(font_size, label.as_str(), &font);
-	let offset =
-		get_x_axis_label_offset(&axis_glyphs, canvas.dimensions().0, canvas.dimensions().1);
-	draw_glyphs(canvas, BLACK, axis_glyphs, offset);
-	return offset.1;
-}
-
-/// Using glyph sizes calculate by how much the axis label should be offset from the origin
-fn get_x_axis_label_offset(
-	glyphs: &Vec<PositionedGlyph>,
-	canvas_width: u32,
-	canvas_height: u32,
-) -> (u32, u32) {
-	let width = {
-		let min_x = glyphs
-			.first()
-			.map(|g| g.pixel_bounding_box().unwrap().min.x)
-			.unwrap();
-		let max_x = glyphs
-			.last()
-			.map(|g| g.pixel_bounding_box().unwrap().max.x)
-			.unwrap();
-		(max_x - min_x) as u32
-	};
-	let height = {
-		let min_y = glyphs
-			.first()
-			.map(|g| g.pixel_bounding_box().unwrap().min.y)
-			.unwrap();
-		let max_y = glyphs
-			.last()
-			.map(|g| g.pixel_bounding_box().unwrap().max.y)
-			.unwrap();
-		(max_y - min_y) as u32
-	};
-	debug!("X-axis label width: {}", width);
-	debug!("X-axis label height: {}", height);
-	let horizontal_position = (canvas_width / 2) - (width / 2);
-	debug!("X-axis horizontal offset: {}", horizontal_position);
-	// scale by 2 so the bottom has some whitespace
-	let vertical_postion = canvas_height - (height * 2);
-	debug!("X-axis vertical offset: {}", vertical_postion);
-	return (horizontal_position, vertical_postion);
+	let glyphs: Vec<PositionedGlyph> = create_glyphs(font_size, label.as_str(), &font);
+	let width = get_width_of_glyphs(&glyphs);
+	let height = get_maximum_height_of_glyphs(&glyphs);
+	match quadrants {
+		Quadrants::RightPair => todo!(),
+		Quadrants::LeftPair => todo!(),
+		Quadrants::TopPair => todo!(),
+		Quadrants::BottomPair => todo!(),
+		Quadrants::AllQuadrants => todo!(),
+		Quadrants::TopRight => {
+			debug!("Placing x-axis label in bottom right corner");
+			let position: (u32, u32) = (canvas.dimensions().0 - CANVAS_BORDER_PIXELS - (width), canvas.dimensions().1 - CANVAS_BORDER_PIXELS - height);
+			draw_glyphs(canvas, BLACK, glyphs, position);
+			return CANVAS_BORDER_PIXELS + height + CANVAS_BORDER_PIXELS
+		},
+		Quadrants::TopLeft => todo!(),
+		Quadrants::BottomRight => todo!(),
+		Quadrants::BottomLeft => todo!(),
+	}
 }
 /// Find the pixel pair which pinpoints the origin of the x-y axes.
 ///
@@ -319,28 +266,8 @@ fn get_x_axis_scale_label_offset(
 	origin_x: u32,
 	origin_y: u32,
 ) -> (u32, u32) {
-	let width = {
-		let min_x = glyphs
-			.first()
-			.map(|g| g.pixel_bounding_box().unwrap().min.x)
-			.unwrap();
-		let max_x = glyphs
-			.last()
-			.map(|g| g.pixel_bounding_box().unwrap().max.x)
-			.unwrap();
-		(max_x - min_x) as u32
-	};
-	let height = {
-		let min_y = glyphs
-			.first()
-			.map(|g| g.pixel_bounding_box().unwrap().min.y)
-			.unwrap();
-		let max_y = glyphs
-			.last()
-			.map(|g| g.pixel_bounding_box().unwrap().max.y)
-			.unwrap();
-		(max_y - min_y) as u32
-	};
+	let width = get_width_of_glyphs(glyphs);
+	let height = get_maximum_height_of_glyphs(glyphs);
 	trace!("X-axis data label width: {}", width);
 	trace!("X-axis data label height: {}", height);
 	//TODO: there must be a better way than using a scale factor of 2?
@@ -447,28 +374,8 @@ fn get_y_axis_scale_label_offset(
 	origin_x: u32,
 	origin_y: u32,
 ) -> (u32, u32) {
-	let width = {
-		let min_x = glyphs
-			.first()
-			.map(|g| g.pixel_bounding_box().unwrap().min.x)
-			.unwrap();
-		let max_x = glyphs
-			.last()
-			.map(|g| g.pixel_bounding_box().unwrap().max.x)
-			.unwrap();
-		(max_x - min_x) as u32
-	};
-	let height = {
-		let min_y = glyphs
-			.first()
-			.map(|g| g.pixel_bounding_box().unwrap().min.y)
-			.unwrap();
-		let max_y = glyphs
-			.last()
-			.map(|g| g.pixel_bounding_box().unwrap().max.y)
-			.unwrap();
-		(max_y - min_y) as u32
-	};
+	let width = get_width_of_glyphs(glyphs);
+	let height = get_maximum_height_of_glyphs(glyphs);
 
 	trace!("Y-axis data label width: {}", width);
 	trace!("Y-axis data label height: {}", height);

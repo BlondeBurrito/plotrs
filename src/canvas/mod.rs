@@ -11,6 +11,9 @@ pub mod glyphs;
 pub mod legend;
 pub mod plot;
 pub mod title;
+pub mod quadrants;
+
+pub const CANVAS_BORDER_PIXELS: u32 = 10;
 
 /// Create a blank canvas which can be mutated with content
 pub fn draw_base_canvas(canvas_pixel_size: (u32, u32)) -> ImageBuffer<Rgba<u8>, Vec<u8>> {
