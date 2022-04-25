@@ -12,7 +12,7 @@ use crate::{
 		axes::build_x_axis_label,
 		axes::build_y_axis_label,
 		axes::{
-			draw_xy_axes, get_x_axis_pixel_length, get_xy_axis_pixel_max, get_xy_axis_pixel_origin,
+			draw_xy_axes, get_x_axis_pixel_length, get_xy_axis_pixel_min_max, get_xy_axis_pixel_origin,
 			get_y_axis_pixel_length,
 		},
 		best_fit::BestFit,
@@ -122,21 +122,24 @@ pub fn scatter_builder(path: &str, output: &str, csv_delimiter: &str) {
 	// With the text drawn we can calculate the rectangular space for the axes, represrnted as two tuples
 	// pinpointing the bottom left origin of the graph and the top right corner.
 	// Pixel position of axes origin
-	let axis_min: (u32, u32) = get_xy_axis_pixel_origin(
+	let axis_origin: (u32, u32) = get_xy_axis_pixel_origin(
+		&quadrants,
 		horizontal_pixels_used,
 		vertical_pixels_used_from_bottom,
 		canvas.dimensions(),
 	);
+	debug!("Origin axis placement {:?}", axis_origin);
 	// Pixel position showing the maximum extents of the axes
-	let axis_max: (u32, u32) = get_xy_axis_pixel_max(
-		axis_min,
+	let (axis_min, axis_max): ((u32, u32), (u32, u32)) = get_xy_axis_pixel_min_max(
+		&quadrants,
+		axis_origin,
 		vertical_pixels_used_from_top,
 		legend_scale_factor,
 		canvas.dimensions(),
 		scatter.x_axis_resolution,
 		scatter.y_axis_resolution,
 	);
-	debug!("Origin axis placement {:?}", axis_min);
+	debug!("Minimum axis placement {:?}", axis_min);
 	debug!("Maximun axis placement {:?}", axis_max);
 	// We need to know how the csv data scales to the length of axes for plotting,
 	// ie. we need a scale factor of how many units of data there is to one pixel
@@ -146,29 +149,20 @@ pub fn scatter_builder(path: &str, output: &str, csv_delimiter: &str) {
 	let y_axis_length = get_y_axis_pixel_length(axis_max.1, axis_min.1);
 	debug!("X-axis length {}", x_axis_length);
 	debug!("Y-axis length {}", y_axis_length);
-	// next we need to know the 'size' of our data, min x-y and max x-y
-	let bounds: ((f32, f32), (f32, f32)) = get_data_bounds(&scatter.data_sets, csv_delimiter);
-	debug!("Min and max data points: {:?}", bounds);
-	// We want to create buffer space around our bounds so data points are not plotted directly on an axis, if
-	// large symbols are used for plotting they may obscure data labels on an axis
-	let bounds_with_buffer: ((u32, u32), (u32, u32)) = (
-		((bounds.0 .0 / 1.1) as u32, (bounds.0 .1 / 1.1) as u32),
-		((bounds.1 .0 * 1.1) as u32, (bounds.1 .1 * 1.1) as u32),
-	);
-	debug!("Axes bounds {:?}", bounds_with_buffer);
-	let x_data_min_max_limits: (u32, u32) = (bounds_with_buffer.0 .0, bounds_with_buffer.1 .0);
-	let y_data_min_max_limits: (u32, u32) = (bounds_with_buffer.0 .1, bounds_with_buffer.1 .1);
+	let x_data_min_max_limits: (i32, i32) = (min_xy_scaled.0, max_xy_scaled.0);
+	let y_data_min_max_limits: (i32, i32) = (min_xy_scaled.1, max_xy_scaled.1);
 	// Now we can find the number of axis units per x and y
 	//TODO: single row data set causes divide by zero
 	let x_axis_data_scale_factor: f32 =
-		x_axis_length as f32 / (bounds_with_buffer.1 .0 as f32 - bounds_with_buffer.0 .0 as f32);
+		x_axis_length as f32 / (max_xy_scaled.0 as f32 - min_xy_scaled.0 as f32).abs();
 	let y_axis_data_scale_factor: f32 =
-		y_axis_length as f32 / (bounds_with_buffer.1 .1 as f32 - bounds_with_buffer.0 .1 as f32);
+		y_axis_length as f32 / (max_xy_scaled.1 as f32 - min_xy_scaled.1 as f32).abs();
 	debug!("X-axis scale factor {}", x_axis_data_scale_factor);
 	debug!("Y-axis scale factor {}", y_axis_data_scale_factor);
 
 	draw_xy_axes(
 		&mut canvas,
+		axis_origin,
 		axis_min,
 		axis_max,
 		x_axis_length,
@@ -201,9 +195,9 @@ pub fn scatter_builder(path: &str, output: &str, csv_delimiter: &str) {
 					x_data_min_max_limits.1,
 					y_data_min_max_limits.0,
 					y_data_min_max_limits.1,
-					scatter.canvas_pixel_size.0,
+					scatter.canvas_pixel_size.0 as i32,
 				);
-				let origin_offset = (axis_min.0, axis_min.1);
+				let origin_offset = (axis_origin.0, axis_origin.1);
 				for p in points.iter() {
 					p.draw_point(
 						&mut canvas,
@@ -223,7 +217,7 @@ pub fn scatter_builder(path: &str, output: &str, csv_delimiter: &str) {
 		&mut canvas,
 		x_axis_data_scale_factor,
 		y_axis_data_scale_factor,
-		(axis_min.0, axis_min.1),
+		(axis_origin.0, axis_origin.1),
 	);
 
 	// save the resulting image

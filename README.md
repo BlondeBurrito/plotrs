@@ -5,6 +5,10 @@
 [![MIT/Apache 2.0](https://img.shields.io/badge/license-MIT%2FApache-blue.svg)](./LICENSE)
 [![Crates.io](https://img.shields.io/crates/d/plotrs.svg)](https://crates.io/crates/plotrs)
 
+todo: quadrant examples
+todo: add error bars to scatter full as the showcase example in top of readme
+todo: checked sub and addition to ensure pixel u32s are not overflowing maybe?
+
 # plotrs
 
 A CLI app for plotting csv data sets onto a graph. It works by reading a graph definition from a `.ron` file, then extracts data from one or more csv files and produces a `.png` image.
@@ -17,6 +21,7 @@ A CLI app for plotting csv data sets onto a graph. It works by reading a graph d
 * Graph element/component positions and sizes are dynamically calculated based on the size of the image you want
 * Multiple colours and symbols can be used to plot data sets
 * Data can be sourced from one or more csv files - you're simply targeting certain columns in a given file for extraction
+* Error bars - plot uncertainty in `x` and `y` singly or jointly
 
 ## Install
 

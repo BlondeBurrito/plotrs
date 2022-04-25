@@ -66,60 +66,78 @@ pub fn build_x_axis_label(
 		Quadrants::BottomLeft => todo!(),
 	}
 }
-/// Find the pixel pair which pinpoints the origin of the x-y axes.
-///
-/// X is small as it's drawn from the left hand border based on canvas origin in top right (0,0).
-///
-/// Y is large as it's the pixel most towrds the bottom left canvas corner, which is far away from the canvas (0, 0) in the top left corner
+/// Find the pixel pair which pinpoints the origin of the x-y axes based on wha quadrants need to be drawn.
 pub fn get_xy_axis_pixel_origin(
+	quadrants: &Quadrants,
 	x: u32,
 	vertical_pixels_from_bottom: u32,
 	canvas_size: (u32, u32),
 ) -> (u32, u32) {
-	// ensures at least 10% of the left and bottom canvas is free
-	(
-		x + (canvas_size.0 / 10),
-		vertical_pixels_from_bottom - (canvas_size.1 / 10),
-	)
+	match quadrants {
+		Quadrants::RightPair => todo!(),
+		Quadrants::LeftPair => todo!(),
+		Quadrants::TopPair => todo!(),
+		Quadrants::BottomPair => todo!(),
+		Quadrants::AllQuadrants => todo!(),
+		Quadrants::TopRight => {
+			// ensures at least 10% of the left and bottom canvas is free
+			(
+				x + (canvas_size.0 / 10),
+				canvas_size.1 -(canvas_size.1 / 10) - vertical_pixels_from_bottom,
+			)
+		},
+		Quadrants::TopLeft => todo!(),
+		Quadrants::BottomRight => todo!(),
+		Quadrants::BottomLeft => todo!(),
+	}
 }
 /// Find the pixel pair which pinpoints the maxmium length and height of the axes. Resolutions are
 /// used to ensure that the length of each axis is a natural scale factor of the resolution. This
 /// allows for accurately plotting data points
-///
-/// X is large as it's to the rightmost side of the canvas based on canvas origin in top right (0,0).
-///
-/// Y is small as it's near to the (0,0) canvas origin in the top left
-pub fn get_xy_axis_pixel_max(
+pub fn get_xy_axis_pixel_min_max(
+	quadrants: &Quadrants,
 	axis_origin: (u32, u32),
 	vertical_pixels_from_top: u32,
 	legend_scale_factor: u32,
 	canvas_size: (u32, u32),
 	x_axis_resolution: u32,
 	y_axis_resolution: u32,
-) -> (u32, u32) {
-	// ensures the whitespace to the left and right are the same when a legend is not specified
-	let maximum_possible_x = canvas_size.0 - (axis_origin.0 * legend_scale_factor);
-	// The true length of the axis must be a factor of the resolution so that axis scale markings
-	// accurately line up with plotted points
-	let mut x = maximum_possible_x.clone();
-	'outer_x: for i in 0..maximum_possible_x {
-		if get_x_axis_pixel_length(axis_origin.0, x - i) % x_axis_resolution == 0 {
-			x = x - i;
-			break 'outer_x;
-		}
+) -> ((u32, u32), (u32, u32)) {
+	match quadrants {
+		Quadrants::RightPair => todo!(),
+		Quadrants::LeftPair => todo!(),
+		Quadrants::TopPair => todo!(),
+		Quadrants::BottomPair => todo!(),
+		Quadrants::AllQuadrants => todo!(),
+		Quadrants::TopRight => {
+			// ensures the whitespace to the left and right are the same when a legend is not specified
+			let maximum_possible_x = canvas_size.0 - (axis_origin.0 * legend_scale_factor);
+			// The true length of the axis must be a factor of the resolution so that axis scale markings
+			// accurately line up with plotted points
+			let mut x = maximum_possible_x.clone();
+			'outer_x: for i in 0..maximum_possible_x {
+				if get_x_axis_pixel_length(axis_origin.0, x - i) % x_axis_resolution == 0 {
+					x = x - i;
+					break 'outer_x;
+				}
+			}
+			// ensures at least 5% of the top canvas is free
+			let minimum_possible_y = vertical_pixels_from_top + (canvas_size.1 / 20);
+			// The true length of the axis must be a factor of the resolution so that axis scale markings
+			// accurately line up with plotted points
+			let mut y = minimum_possible_y.clone();
+			'outer_y: for i in 0..minimum_possible_y {
+				if get_y_axis_pixel_length(y + i, axis_origin.1) % y_axis_resolution == 0 {
+					y = y + i;
+					break 'outer_y;
+				}
+			}
+			return (axis_origin, (x, y));
+		},
+		Quadrants::TopLeft => todo!(),
+		Quadrants::BottomRight => todo!(),
+		Quadrants::BottomLeft => todo!(),
 	}
-	// ensures at least 5% of the top canvas is free
-	let minimum_possible_y = vertical_pixels_from_top + (canvas_size.1 / 20);
-	// The true length of the axis must be a factor of the resolution so that axis scale markings
-	// accurately line up with plotted points
-	let mut y = minimum_possible_y.clone();
-	'outer_y: for i in 0..minimum_possible_y {
-		if get_y_axis_pixel_length(y + i, axis_origin.1) % y_axis_resolution == 0 {
-			y = y + i;
-			break 'outer_y;
-		}
-	}
-	return (x, y);
 }
 /// Get the pixel length of the x-axis
 pub fn get_x_axis_pixel_length(min_pixel: u32, max_pixel: u32) -> u32 {
@@ -133,24 +151,25 @@ pub fn get_y_axis_pixel_length(min_pixel: u32, max_pixel: u32) -> u32 {
 /// Within the acceptable pixel space for the axes draw them, note the top left corner of the canvas is the origin `(0, 0)` with bottom right `(canvas.dimensions().0, canvas.dimensions().1)`
 pub fn draw_xy_axes(
 	canvas: &mut ImageBuffer<Rgba<u8>, Vec<u8>>,
-	origin_pixel: (u32, u32),
-	max_pixel: (u32, u32),
+	axis_origin_pixel: (u32, u32),
+	axis_min_pixel: (u32, u32),
+	axis_max_pixel: (u32, u32),
 	x_axis_length: u32,
 	y_axis_length: u32,
-	x_data_min_max_limits: (u32, u32),
-	y_data_min_max_limits: (u32, u32),
+	x_data_min_max_limits: (i32, i32),
+	y_data_min_max_limits: (i32, i32),
 	font_size: f32,
 	has_grid: bool,
 	x_axis_resolution: u32,
 	y_axis_resolution: u32,
 ) {
 	// x-axis
-	draw_x_axis(canvas, origin_pixel, x_axis_length);
+	draw_x_axis(canvas, axis_min_pixel, axis_origin_pixel, axis_max_pixel, x_axis_length);
 	// x-axis data labels
 	draw_x_axis_scale_markings(
 		canvas,
-		origin_pixel,
-		max_pixel,
+		axis_origin_pixel,
+		axis_max_pixel,
 		x_axis_length,
 		x_data_min_max_limits,
 		font_size,
@@ -158,12 +177,12 @@ pub fn draw_xy_axes(
 		x_axis_resolution,
 	);
 	// y-axis
-	draw_y_axis(canvas, origin_pixel, max_pixel, y_axis_length);
+	draw_y_axis(canvas, axis_origin_pixel, axis_max_pixel, y_axis_length);
 	// y-axis data labels
 	draw_y_axis_scale_markings(
 		canvas,
-		origin_pixel,
-		max_pixel,
+		axis_origin_pixel,
+		axis_max_pixel,
 		y_axis_length,
 		y_data_min_max_limits,
 		font_size,
@@ -175,12 +194,19 @@ pub fn draw_xy_axes(
 /// of the image origin being based in the top-left corner while the graph origin is in the bottom left
 fn draw_x_axis(
 	canvas: &mut ImageBuffer<Rgba<u8>, Vec<u8>>,
-	origin_pixel: (u32, u32),
+	axis_min_pixel: (u32, u32),
+	axis_origin_pixel: (u32, u32),
+	axis_max_pixel: (u32, u32),
 	x_axis_length: u32,
 ) {
 	debug!("Drawing x-axis");
-	for px in origin_pixel.0..(x_axis_length + origin_pixel.0) {
-		canvas.put_pixel(px, origin_pixel.1, Rgba(BLACK));
+	// draw from the origin to max pixel
+	for px in axis_origin_pixel.0..(axis_max_pixel.0) {
+		canvas.put_pixel(px, axis_origin_pixel.1, Rgba(BLACK));
+	}
+	// draw from min pixel to origin
+	for px in axis_min_pixel.0..(axis_origin_pixel.0) {
+		canvas.put_pixel(px, axis_origin_pixel.1, Rgba(BLACK));
 	}
 }
 /// Draws the scale markings along the x-axis
@@ -189,7 +215,7 @@ fn draw_x_axis_scale_markings(
 	origin_pixel: (u32, u32),
 	max_pixel: (u32, u32),
 	x_axis_length: u32,
-	x_data_min_max_limits: (u32, u32),
+	x_data_min_max_limits: (i32, i32),
 	font_size: f32,
 	has_grid: bool,
 	x_axis_resolution: u32,
@@ -300,7 +326,7 @@ fn draw_y_axis_scale_markings(
 	origin_pixel: (u32, u32),
 	max_pixel: (u32, u32),
 	y_axis_length: u32,
-	y_data_min_max_limits: (u32, u32),
+	y_data_min_max_limits: (i32, i32),
 	font_size: f32,
 	has_grid: bool,
 	y_axis_resolution: u32,

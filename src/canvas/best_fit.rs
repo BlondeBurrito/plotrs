@@ -89,11 +89,11 @@ impl BestFit {
 	/// Based of type of `BestFit` curve generate its coordinates within the given bounds
 	pub fn find_coordinates(
 		&self,
-		x_min: u32,
-		x_max: u32,
-		y_min: u32,
-		y_max: u32,
-		scale_factor: u32,
+		x_min: i32,
+		x_max: i32,
+		y_min: i32,
+		y_max: i32,
+		scale_factor: i32,
 	) -> Vec<DataPoint> {
 		match self {
 			BestFit::Linear {
