@@ -804,10 +804,17 @@ fn draw_x_axis_scale_markings(
 				// Draw each even section slightly longer
 				let label_length_scale = if i & 1 == 1 { 2 } else { 3 };
 				for n in 0..(data_label_length * label_length_scale) {
-					// for n in 0..(data_label_length) {
+					// So that scale markers are not drawn on the graph area itself check which quadrant type
+					// and flip if necessary so they are drawn in the available whitespace outside the axis
+					let px = axis_origin_pixel.0 + (i * x_subdivision_length);
+					let py = if *quadrants == Quadrants::BottomPair {
+						axis_origin_pixel.1 - n
+					} else {
+						axis_origin_pixel.1 + n
+					};
 					canvas.put_pixel(
-						axis_origin_pixel.0 + (i * x_subdivision_length),
-						axis_origin_pixel.1 + n,
+						px,
+						py,
 						Rgba(BLACK),
 					);
 				}
@@ -817,7 +824,13 @@ fn draw_x_axis_scale_markings(
 					let text = (x_value_per_subdivision * i as f32).to_string();
 				let glyphs = create_glyphs(font_size, &text, &font);
 				let origin_x = axis_origin_pixel.0 + (i * x_subdivision_length);
-				let origin_y = axis_origin_pixel.1 + (data_label_length * label_length_scale);
+				// So that scale markers are not drawn on the graph area itself check which quadrant type
+				// and flip if necessary so they are drawn in the available whitespace outside the axis
+				let origin_y = if *quadrants == Quadrants::BottomPair {
+					axis_origin_pixel.1 - (data_label_length * label_length_scale) - (get_maximum_height_of_glyphs(&glyphs) * 3)
+				} else {
+					axis_origin_pixel.1 + (data_label_length * label_length_scale)
+				};
 				// let origin_y = origin_pixel.1 + (data_label_length);
 				let offset = get_x_axis_scale_label_offset(&glyphs, origin_x, origin_y);
 				trace!("Drawing x-axis label {} at {:?}", text, offset);
@@ -834,10 +847,17 @@ fn draw_x_axis_scale_markings(
 							for j in 1..=*mc {
 								let marker_spacing = x_subdivision_length / (mc + 1);
 								for n in 0..data_label_length {
+									let px = axis_origin_pixel.0
+									+ ((i * x_subdivision_length) + (j * marker_spacing));
+									// ensure mrkers are drawn in whitespace
+									let py = if *quadrants == Quadrants::BottomPair {
+										axis_origin_pixel.1 - n
+									} else {
+										axis_origin_pixel.1 + n
+									};
 									canvas.put_pixel(
-										axis_origin_pixel.0
-											+ ((i * x_subdivision_length) + (j * marker_spacing)),
-										axis_origin_pixel.1 + n,
+										px,
+										py,
 										Rgba(BLACK),
 									);
 								}
@@ -852,10 +872,17 @@ fn draw_x_axis_scale_markings(
 				// Draw each even section slightly longer
 				let label_length_scale = if i & 1 == 1 { 2 } else { 3 };
 				for n in 0..(data_label_length * label_length_scale) {
-					// for n in 0..(data_label_length) {
+					// So that scale markers are not drawn on the graph area itself check which quadrant type
+					// and flip if necessary so they are drawn in the available whitespace outside the axis
+					let px = axis_origin_pixel.0 - (i * x_subdivision_length);
+					let py = if *quadrants == Quadrants::BottomPair {
+						axis_origin_pixel.1 - n
+					} else {
+						axis_origin_pixel.1 + n
+					};
 					canvas.put_pixel(
-						axis_origin_pixel.0 - (i * x_subdivision_length),
-						axis_origin_pixel.1 + n,
+						px,
+						py,
 						Rgba(BLACK),
 					);
 				}
@@ -865,7 +892,13 @@ fn draw_x_axis_scale_markings(
 					let text =  (-x_value_per_subdivision * i as f32).to_string();
 				let glyphs = create_glyphs(font_size, &text, &font);
 				let origin_x = axis_origin_pixel.0 - (i * x_subdivision_length);
-				let origin_y = axis_origin_pixel.1 + (data_label_length * label_length_scale);
+				// So that scale markers are not drawn on the graph area itself check which quadrant type
+				// and flip if necessary so they are drawn in the available whitespace outside the axis
+				let origin_y = if *quadrants == Quadrants::BottomPair {
+					axis_origin_pixel.1 - (data_label_length * label_length_scale) - (get_maximum_height_of_glyphs(&glyphs) * 5)
+				} else {
+					axis_origin_pixel.1 + (data_label_length * label_length_scale)
+				};
 				// let origin_y = origin_pixel.1 + (data_label_length);
 				let offset = get_x_axis_scale_label_offset(&glyphs, origin_x, origin_y);
 				trace!("Drawing x-axis label {} at {:?}", text, offset);
@@ -882,10 +915,17 @@ fn draw_x_axis_scale_markings(
 							for j in 1..=*mc {
 								let marker_spacing = x_subdivision_length / (mc + 1);
 								for n in 0..data_label_length {
+									let px = axis_origin_pixel.0
+									- ((i * x_subdivision_length) + (j * marker_spacing));
+									// ensure mrkers are drawn in whitespace
+									let py = if *quadrants == Quadrants::BottomPair {
+										axis_origin_pixel.1 - n
+									} else {
+										axis_origin_pixel.1 + n
+									};
 									canvas.put_pixel(
-										axis_origin_pixel.0
-											- ((i * x_subdivision_length) + (j * marker_spacing)),
-										axis_origin_pixel.1 + n,
+										px,
+										py,
 										Rgba(BLACK),
 									);
 								}
@@ -926,10 +966,17 @@ fn draw_x_axis_scale_markings(
 				// Draw each even section slightly longer
 				let label_length_scale = if i & 1 == 1 { 2 } else { 3 };
 				for n in 0..(data_label_length * label_length_scale) {
-					// for n in 0..(data_label_length) {
+					// So that scale markers are not drawn on the graph area itself check which quadrant type
+					// and flip if necessary so they are drawn in the available whitespace outside the axis
+					let px = axis_min_pixel.0 + (i * x_subdivision_length);
+					let py = if *quadrants == Quadrants::BottomRight {
+						axis_origin_pixel.1 - n
+					} else {
+						axis_origin_pixel.1 + n
+					};
 					canvas.put_pixel(
-						axis_min_pixel.0 + (i * x_subdivision_length),
-						axis_origin_pixel.1 + n,
+						px,
+						py,
 						Rgba(BLACK),
 					);
 				}
@@ -937,7 +984,13 @@ fn draw_x_axis_scale_markings(
 				let text = (x_data_min_max_limits.0 as f32 + (x_value_per_subdivision * i as f32)).to_string();
 				let glyphs = create_glyphs(font_size, &text, &font);
 				let origin_x = axis_min_pixel.0 + (i * x_subdivision_length);
-				let origin_y = axis_origin_pixel.1 + (data_label_length * label_length_scale);
+				// So that scale markers are not drawn on the graph area itself check which quadrant type
+				// and flip if necessary so they are drawn in the available whitespace outside the axis
+				let origin_y = if *quadrants == Quadrants::BottomRight {
+					axis_origin_pixel.1 - (data_label_length * label_length_scale) - (get_maximum_height_of_glyphs(&glyphs) * 3)
+				} else {
+					axis_origin_pixel.1 + (data_label_length * label_length_scale)
+				};
 				// let origin_y = origin_pixel.1 + (data_label_length);
 				let offset = get_x_axis_scale_label_offset(&glyphs, origin_x, origin_y);
 				trace!("Drawing x-axis label {} at {:?}", text, offset);
@@ -953,10 +1006,17 @@ fn draw_x_axis_scale_markings(
 							for j in 1..=*mc {
 								let marker_spacing = x_subdivision_length / (mc + 1);
 								for n in 0..data_label_length {
+									// So that scale markers are not drawn on the graph area itself check which quadrant type
+									// and flip if necessary so they are drawn in the available whitespace outside the axis
+									let px = axis_min_pixel.0 + ((i * x_subdivision_length) + (j * marker_spacing));
+									let py = if *quadrants == Quadrants::BottomRight {
+										axis_origin_pixel.1 - n
+									} else {
+										axis_origin_pixel.1 + n
+									};
 									canvas.put_pixel(
-										axis_min_pixel.0
-											+ ((i * x_subdivision_length) + (j * marker_spacing)),
-										axis_origin_pixel.1 + n,
+										px,
+										py,
 										Rgba(BLACK),
 									);
 								}
