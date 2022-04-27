@@ -198,14 +198,7 @@ You can also indicate uncertainty with the use of error bars which can be specif
 
 Based on the range of values across a given number of data sets the cartesian quadrants required are determined during exection with scale markings and axis labels moved appropriately.
 
-<img src="examples/scatter_quadrants/top_right_quadrant_example.png" alt="s" width="300"/><img src="examples/scatter_quadrants/top_left_quadrant_example.png" alt="s" width="300"/>
-<img src="examples/scatter_quadrants/bottom_right_quadrant_example.png" alt="s" width="300"/>
-<img src="examples/scatter_quadrants/bottom_left_quadrant_example.png" alt="s" width="300"/>
-<img src="examples/scatter_quadrants/top_pair_quadrant_example.png" alt="s" width="300"/>
-<img src="examples/scatter_quadrants/bottom_pair_quadrant_example.png" alt="s" width="300"/>
-<img src="examples/scatter_quadrants/left_pair_quadrant_example.png" alt="s" width="300"/>
-<img src="examples/scatter_quadrants/right_pair_quadrant_example.png" alt="s" width="300"/>
-<img src="examples/scatter_quadrants/all_quadrants_example.png" alt="s" width="300"/>
+<img src="examples/scatter_quadrants/top_right_quadrant_example.png" alt="s" width="300"/><img src="examples/scatter_quadrants/top_left_quadrant_example.png" alt="s" width="300"/><img src="examples/scatter_quadrants/bottom_right_quadrant_example.png" alt="s" width="300"/><img src="examples/scatter_quadrants/bottom_left_quadrant_example.png" alt="s" width="300"/><img src="examples/scatter_quadrants/top_pair_quadrant_example.png" alt="s" width="300"/><img src="examples/scatter_quadrants/bottom_pair_quadrant_example.png" alt="s" width="300"/><img src="examples/scatter_quadrants/left_pair_quadrant_example.png" alt="s" width="300"/><img src="examples/scatter_quadrants/right_pair_quadrant_example.png" alt="s" width="300"/><img src="examples/scatter_quadrants/all_quadrants_example.png" alt="s" width="300"/>
 
 ## Contributing
 
