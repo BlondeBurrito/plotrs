@@ -9,11 +9,11 @@ mod data;
 
 use crate::{
 	canvas::{
-		axes::build_x_axis_label,
-		axes::build_y_axis_label,
+		axes::axis_x::build_x_axis_label,
+		axes::axis_y::build_y_axis_label,
 		axes::{
-			draw_xy_axes, get_x_axis_pixel_length, get_xy_axis_pixel_min_max,
-			get_xy_axis_pixel_origin, get_y_axis_pixel_length,
+			axis_x::get_x_axis_pixel_length, axis_y::get_y_axis_pixel_length, draw_xy_axes,
+			get_xy_axis_pixel_min_max, get_xy_axis_pixel_origin,
 		},
 		best_fit::BestFit,
 		draw_base_canvas,
@@ -104,8 +104,10 @@ pub fn scatter_builder(path: &str, output: &str, csv_delimiter: &str) {
 	// optionally build the legend
 	if scatter.has_legend {
 		let legend_fields = get_legend_fields(&scatter.data_sets);
-		let legend_origin_x = canvas.dimensions().0 - canvas_edges_used.h_space_from_right - (canvas.dimensions().0/10);
-		let legend_origin_y = canvas_edges_used.v_space_from_top + canvas.dimensions().1/4;
+		let legend_origin_x = canvas.dimensions().0
+			- canvas_edges_used.h_space_from_right
+			- (canvas.dimensions().0 / 10);
+		let legend_origin_y = canvas_edges_used.v_space_from_top + canvas.dimensions().1 / 4;
 		// let legend_origin: (u32, u32) = (axis_max.0, axis_max.1 * 2);
 		canvas_edges_used.add(build_legend(
 			&mut canvas,

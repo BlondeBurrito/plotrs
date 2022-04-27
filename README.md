@@ -212,9 +212,7 @@ Based on the range of values across a given number of data sets the cartesian qu
 
 ## TODO
 
-* Negative axes
 * Show BestFit types in legend
 * Allow overriding font
-* quadrant examples
 * add error bars to scatter full as the showcase example in top of readme
 * checked sub and addition to ensure pixel u32s are not overflowing maybe?

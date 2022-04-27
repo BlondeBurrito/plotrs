@@ -4,7 +4,10 @@ use image::{ImageBuffer, Rgba};
 use tracing::{debug, trace, warn};
 
 use crate::{
-	canvas::{glyphs::{create_glyphs, draw_glyphs, get_maximum_height_of_glyphs}, VHConsumedCanvasSpace},
+	canvas::{
+		glyphs::{create_glyphs, draw_glyphs, get_maximum_height_of_glyphs},
+		VHConsumedCanvasSpace,
+	},
 	colours::{Colour, BLACK},
 	get_system_font,
 };
@@ -66,9 +69,9 @@ pub fn build_legend(
 		draw_glyphs(canvas, BLACK, glyphs, text_position);
 	}
 	VHConsumedCanvasSpace {
-    v_space_from_top: 0,
-    h_space_from_right: canvas.dimensions().0 - origin.0,
-    v_space_from_bottom: 0,
-    h_space_from_left: 0,
-}
+		v_space_from_top: 0,
+		h_space_from_right: canvas.dimensions().0 - origin.0,
+		v_space_from_bottom: 0,
+		h_space_from_left: 0,
+	}
 }
