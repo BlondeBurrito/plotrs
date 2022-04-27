@@ -101,6 +101,19 @@ pub fn scatter_builder(path: &str, output: &str, csv_delimiter: &str) {
 		&scatter.title,
 		font_sizes.title_font_size,
 	));
+	// optionally build the legend
+	if scatter.has_legend {
+		let legend_fields = get_legend_fields(&scatter.data_sets);
+		let legend_origin_x = canvas.dimensions().0 - canvas_edges_used.h_space_from_right - (canvas.dimensions().0/10);
+		let legend_origin_y = canvas_edges_used.v_space_from_top + canvas.dimensions().1/4;
+		// let legend_origin: (u32, u32) = (axis_max.0, axis_max.1 * 2);
+		canvas_edges_used.add(build_legend(
+			&mut canvas,
+			(legend_origin_x, legend_origin_y),
+			legend_fields,
+			font_sizes.legend_font_size,
+		));
+	}
 	// Find the size of the data - this tells us whether any axis requires a negative range.
 	// Of the form `(min_x, min_y), (max_x, max_y)`
 	info!("Finding min and max range of data...");
@@ -160,9 +173,6 @@ pub fn scatter_builder(path: &str, output: &str, csv_delimiter: &str) {
 		canvas_edges_used.v_space_from_bottom,
 		canvas_edges_used.h_space_from_left,
 	));
-	// legend_scale_factor decides how much horizontal space should be reserved for a legend
-	//TODO: there must be a nicer way reserve some legend space, for true 2 is way too big
-	let legend_scale_factor = if scatter.has_legend { 1 } else { 1 };
 	// With the text drawn we can calculate the rectangular space for the axes, represrnted as two tuples
 	// pinpointing the bottom left origin of the graph and the top right corner.
 	// Pixel position showing the maximum extents of the axes
@@ -172,7 +182,6 @@ pub fn scatter_builder(path: &str, output: &str, csv_delimiter: &str) {
 		canvas_edges_used.h_space_from_right,
 		canvas_edges_used.v_space_from_bottom,
 		canvas_edges_used.h_space_from_left,
-		legend_scale_factor,
 		canvas.dimensions(),
 		scatter.x_axis_resolution,
 		scatter.y_axis_resolution,
@@ -216,17 +225,6 @@ pub fn scatter_builder(path: &str, output: &str, csv_delimiter: &str) {
 		scatter.x_axis_resolution,
 		scatter.y_axis_resolution,
 	);
-	// optionally build the legend
-	if scatter.has_legend {
-		let legend_fields = get_legend_fields(&scatter.data_sets);
-		let legend_origin: (u32, u32) = (axis_max.0, axis_max.1 * 2);
-		build_legend(
-			&mut canvas,
-			legend_origin,
-			legend_fields,
-			font_sizes.legend_font_size,
-		);
-	}
 	// if a line of best fit has been specified then draw it
 	for set in &scatter.data_sets {
 		match &set.best_fit {

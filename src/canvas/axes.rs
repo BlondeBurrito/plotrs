@@ -175,7 +175,7 @@ pub fn build_x_axis_label(
 		Quadrants::RightPair => {
 			debug!("Placing x-axis label in centre right");
 			let position: (u32, u32) = (
-				canvas.dimensions().0 - CANVAS_BORDER_PIXELS - (width),
+				canvas.dimensions().0 - CANVAS_BORDER_PIXELS - width - horizontal_pixels_from_right,
 				(canvas.dimensions().1 - vertical_pixels_from_top - vertical_pixels_from_bottom)
 					/ 2 + vertical_pixels_from_top
 					+ height,
@@ -207,7 +207,7 @@ pub fn build_x_axis_label(
 		Quadrants::TopPair => {
 			debug!("Placing x-axis label in bottom right corner");
 			let position: (u32, u32) = (
-				canvas.dimensions().0 - CANVAS_BORDER_PIXELS - (width),
+				canvas.dimensions().0 - CANVAS_BORDER_PIXELS - width - horizontal_pixels_from_right,
 				canvas.dimensions().1 - CANVAS_BORDER_PIXELS - height,
 			);
 			draw_glyphs(canvas, BLACK, glyphs, position);
@@ -235,7 +235,7 @@ pub fn build_x_axis_label(
 		Quadrants::AllQuadrants => {
 			debug!("Placing x-axis label in centre right");
 			let position: (u32, u32) = (
-				canvas.dimensions().0 - CANVAS_BORDER_PIXELS - (width),
+				canvas.dimensions().0 - CANVAS_BORDER_PIXELS - (width) - horizontal_pixels_from_right,
 				(canvas.dimensions().1 - vertical_pixels_from_top - vertical_pixels_from_bottom)
 					/ 2 + vertical_pixels_from_top
 					+ height,
@@ -251,7 +251,7 @@ pub fn build_x_axis_label(
 		Quadrants::TopRight => {
 			debug!("Placing x-axis label in bottom right corner");
 			let position: (u32, u32) = (
-				canvas.dimensions().0 - CANVAS_BORDER_PIXELS - (width),
+				canvas.dimensions().0 - CANVAS_BORDER_PIXELS - width - horizontal_pixels_from_right,
 				canvas.dimensions().1 - CANVAS_BORDER_PIXELS - height,
 			);
 			draw_glyphs(canvas, BLACK, glyphs, position);
@@ -315,7 +315,6 @@ pub fn get_xy_axis_pixel_min_max(
 	horizontal_pixels_from_right: u32,
 	vertical_pixels_from_bottom: u32,
 	horizontal_pixels_from_left: u32,
-	legend_scale_factor: u32,
 	canvas_size: (u32, u32),
 	x_axis_resolution: u32,
 	y_axis_resolution: u32,
@@ -325,7 +324,7 @@ pub fn get_xy_axis_pixel_min_max(
 			// ensures the whitespace to the left and right are the same when a legend is not specified
 			let minimum_possible_x = horizontal_pixels_from_left;
 			let maximum_possible_x =
-				canvas_size.0 - (horizontal_pixels_from_right * legend_scale_factor);
+				canvas_size.0 - horizontal_pixels_from_right;
 			// The true length of the axis must be a factor of the resolution so that axis scale markings
 			// accurately line up with plotted points
 			let mut x = maximum_possible_x.clone();
@@ -384,7 +383,7 @@ pub fn get_xy_axis_pixel_min_max(
 			// ensures the whitespace to the left and right are the same when a legend is not specified
 			let minimum_possible_x = horizontal_pixels_from_left;
 			let maximum_possible_x =
-				canvas_size.0 - (horizontal_pixels_from_right * legend_scale_factor);
+				canvas_size.0 - horizontal_pixels_from_right;
 			// The true length of the axis must be a factor of the resolution so that axis scale markings
 			// accurately line up with plotted points
 			let mut x0 = minimum_possible_x.clone();
@@ -414,7 +413,7 @@ pub fn get_xy_axis_pixel_min_max(
 			// ensures the whitespace to the left and right are the same when a legend is not specified
 			let minimum_possible_x = horizontal_pixels_from_left;
 			let maximum_possible_x =
-				canvas_size.0 - (horizontal_pixels_from_right * legend_scale_factor);
+				canvas_size.0 - horizontal_pixels_from_right;
 			// The true length of the axis must be a factor of the resolution so that axis scale markings
 			// accurately line up with plotted points
 			let mut x0 = minimum_possible_x.clone();
@@ -445,7 +444,7 @@ pub fn get_xy_axis_pixel_min_max(
 			// ensures the whitespace to the left and right are the same when a legend is not specified
 			let minimum_possible_x = horizontal_pixels_from_left;
 			let maximum_possible_x =
-				canvas_size.0 - (horizontal_pixels_from_right * legend_scale_factor);
+				canvas_size.0 - horizontal_pixels_from_right;
 			// The true length of the axis must be a factor of the resolution so that axis scale markings
 			// accurately line up with plotted points
 			let mut x0 = minimum_possible_x.clone();
@@ -477,7 +476,7 @@ pub fn get_xy_axis_pixel_min_max(
 			// ensures the whitespace to the left and right are the same when a legend is not specified
 			let minimum_possible_x = horizontal_pixels_from_left;
 			let maximum_possible_x =
-				canvas_size.0 - (horizontal_pixels_from_right * legend_scale_factor);
+				canvas_size.0 - horizontal_pixels_from_right;
 			// The true length of the axis must be a factor of the resolution so that axis scale markings
 			// accurately line up with plotted points
 			let mut x = maximum_possible_x.clone();
@@ -532,7 +531,7 @@ pub fn get_xy_axis_pixel_min_max(
 			// ensures the whitespace to the left and right are the same when a legend is not specified
 			let minimum_possible_x = horizontal_pixels_from_left;
 			let maximum_possible_x =
-				canvas_size.0 - (horizontal_pixels_from_right * legend_scale_factor);
+				canvas_size.0 - horizontal_pixels_from_right;
 			// The true length of the axis must be a factor of the resolution so that axis scale markings
 			// accurately line up with plotted points
 			let mut x = maximum_possible_x.clone();

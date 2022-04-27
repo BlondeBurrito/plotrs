@@ -4,7 +4,7 @@ use image::{ImageBuffer, Rgba};
 use tracing::{debug, trace, warn};
 
 use crate::{
-	canvas::glyphs::{create_glyphs, draw_glyphs},
+	canvas::{glyphs::{create_glyphs, draw_glyphs, get_maximum_height_of_glyphs}, VHConsumedCanvasSpace},
 	colours::{Colour, BLACK},
 	get_system_font,
 };
@@ -24,7 +24,7 @@ pub fn build_legend(
 	origin: (u32, u32),
 	fields: Vec<LegendField>,
 	font_size: f32,
-) {
+) -> VHConsumedCanvasSpace {
 	debug!("Building legend at {:?}...", origin);
 	let font = get_system_font();
 	let items = fields.len();
@@ -41,17 +41,7 @@ pub fn build_legend(
 		trace!("Legend field {:?}", field);
 		let glyphs = create_glyphs(font_size, &field.name, &font);
 		// height is used to write legend fields on new rows
-		let height = {
-			let min_y = glyphs
-				.first()
-				.map(|g| g.pixel_bounding_box().unwrap().min.y)
-				.unwrap();
-			let max_y = glyphs
-				.last()
-				.map(|g| g.pixel_bounding_box().unwrap().max.y)
-				.unwrap();
-			(max_y - min_y) as u32 * 2
-		};
+		let height = get_maximum_height_of_glyphs(&glyphs);
 		let symbol_position = (
 			origin.0 + (max_radius + 1),
 			origin.1 + (i as u32 * height * 2),
@@ -75,4 +65,10 @@ pub fn build_legend(
 		);
 		draw_glyphs(canvas, BLACK, glyphs, text_position);
 	}
+	VHConsumedCanvasSpace {
+    v_space_from_top: 0,
+    h_space_from_right: canvas.dimensions().0 - origin.0,
+    v_space_from_bottom: 0,
+    h_space_from_left: 0,
+}
 }
