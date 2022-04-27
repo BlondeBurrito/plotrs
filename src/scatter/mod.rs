@@ -12,19 +12,21 @@ use crate::{
 		axes::build_x_axis_label,
 		axes::build_y_axis_label,
 		axes::{
-			draw_xy_axes, get_x_axis_pixel_length, get_xy_axis_pixel_min_max, get_xy_axis_pixel_origin,
-			get_y_axis_pixel_length,
+			draw_xy_axes, get_x_axis_pixel_length, get_xy_axis_pixel_min_max,
+			get_xy_axis_pixel_origin, get_y_axis_pixel_length,
 		},
 		best_fit::BestFit,
 		draw_base_canvas,
 		glyphs::FontSizes,
-		legend::{build_legend},
+		legend::build_legend,
 		plot::DataSymbol,
+		quadrants::get_quadrants,
 		save_image,
-		title::build_title, quadrants::get_quadrants, quadrants::Quadrants
+		title::build_title,
+		VHConsumedCanvasSpace,
 	},
 	colours::*,
-	scatter::data::{get_data_bounds, get_legend_fields, build_data_points},
+	scatter::data::{build_data_points, get_data_bounds, get_legend_fields},
 };
 /// Specification of a scatter graph
 #[derive(Debug, Deserialize)]
@@ -86,21 +88,47 @@ pub fn scatter_builder(path: &str, output: &str, csv_delimiter: &str) {
 	// Calcualte font sizes
 	info!("Calculating font sizes...");
 	let font_sizes = FontSizes::new(&scatter.canvas_pixel_size);
+	// To fit the various labels, axes, legend and title all onto the canvas snugly we need some values
+	// telling us how much space has already been occupied by previous elements.
+	// We use these 4 values of the struct to indicate the amount of pixel space consumed from each border of the canvas
+	// in vertical and horizontal directions. The general convention is the are arranged clockwise from the top
+	let mut canvas_edges_used = VHConsumedCanvasSpace::new();
 	// Place the title at the top of the canvas and tell us how many v-pixels have been used
 	info!("Building title...");
-	let vertical_pixels_used_from_top =
-		build_title(&mut canvas, &scatter.title, font_sizes.title_font_size);
+	// Building the title tells us how many pixel have been consumed from the top of the canvas
+	canvas_edges_used.add(build_title(
+		&mut canvas,
+		&scatter.title,
+		font_sizes.title_font_size,
+	));
 	// Find the size of the data - this tells us whether any axis requires a negative range.
 	// Of the form `(min_x, min_y), (max_x, max_y)`
 	info!("Finding min and max range of data...");
-	let (min_xy, max_xy): ((f32, f32), (f32, f32)) = get_data_bounds(&scatter.data_sets, csv_delimiter);
+	let (min_xy, max_xy): ((f32, f32), (f32, f32)) =
+		get_data_bounds(&scatter.data_sets, csv_delimiter);
 	// We want to create buffer space around our bounds so data points are not plotted directly on an axis, if
 	// large symbols are used for plotting they may obscure data labels on an axis. We scale the bounds by 10%
 	// taking care to shrink and expand bounds based on their sign
-	let min_x_scaled = if min_xy.0.is_sign_positive() {min_xy.0 / 1.1} else {min_xy.0 * 1.1};
-	let min_y_scaled = if min_xy.1.is_sign_positive() {min_xy.1 / 1.1} else {min_xy.1 * 1.1};
-	let max_x_scaled = if max_xy.0.is_sign_positive() {max_xy.0 * 1.1} else {max_xy.0 / 1.1};
-	let max_y_scaled = if max_xy.1.is_sign_positive() {max_xy.1 * 1.1} else {max_xy.1 / 1.1};
+	let min_x_scaled = if min_xy.0.is_sign_positive() {
+		min_xy.0 / 1.1
+	} else {
+		min_xy.0 * 1.1
+	};
+	let min_y_scaled = if min_xy.1.is_sign_positive() {
+		min_xy.1 / 1.1
+	} else {
+		min_xy.1 * 1.1
+	};
+	let max_x_scaled = if max_xy.0.is_sign_positive() {
+		max_xy.0 * 1.1
+	} else {
+		max_xy.0 / 1.1
+	};
+	let max_y_scaled = if max_xy.1.is_sign_positive() {
+		max_xy.1 * 1.1
+	} else {
+		max_xy.1 / 1.1
+	};
 	let min_xy_scaled = (min_x_scaled as i32, min_y_scaled as i32);
 	debug!("Minimum x-y with buffer space {:?}", min_xy_scaled);
 	let max_xy_scaled = (max_x_scaled as i32, max_y_scaled as i32);
@@ -109,31 +137,41 @@ pub fn scatter_builder(path: &str, output: &str, csv_delimiter: &str) {
 	let quadrants = get_quadrants(min_xy_scaled, max_xy_scaled);
 	info!("Quadrants to draw based on data set {:?}", quadrants);
 	info!("Building y-axis label...");
-	// Draws the y-axis label and returns the amount of total pixel space used up by all graph elements/compoents
-	let horizontal_pixels_used =
-		build_y_axis_label(&mut canvas, scatter.y_axis_label, font_sizes.axis_font_size, &quadrants, vertical_pixels_used_from_top);
+	// Draws the y-axis label and returns the amount of pixel space used up by the glyphs
+	canvas_edges_used.add(build_y_axis_label(
+		&mut canvas,
+		scatter.y_axis_label,
+		font_sizes.axis_font_size,
+		&quadrants,
+		canvas_edges_used.v_space_from_top,
+		canvas_edges_used.h_space_from_right,
+		canvas_edges_used.v_space_from_bottom,
+		canvas_edges_used.h_space_from_left,
+	));
 	info!("Building x-axis label...");
-	// Draws the x-axis label and returns TODO
-	let vertical_pixels_used_from_bottom =
-		build_x_axis_label(&mut canvas, scatter.x_axis_label, font_sizes.axis_font_size, &quadrants);
+	// Draws the x-axis label and returns the amount of pixel ocupied from the bottom
+	canvas_edges_used.add(build_x_axis_label(
+		&mut canvas,
+		scatter.x_axis_label,
+		font_sizes.axis_font_size,
+		&quadrants,
+		canvas_edges_used.v_space_from_top,
+		canvas_edges_used.h_space_from_right,
+		canvas_edges_used.v_space_from_bottom,
+		canvas_edges_used.h_space_from_left,
+	));
 	// legend_scale_factor decides how much horizontal space should be reserved for a legend
 	//TODO: there must be a nicer way reserve some legend space, for true 2 is way too big
 	let legend_scale_factor = if scatter.has_legend { 1 } else { 1 };
 	// With the text drawn we can calculate the rectangular space for the axes, represrnted as two tuples
 	// pinpointing the bottom left origin of the graph and the top right corner.
-	// Pixel position of axes origin
-	let axis_origin: (u32, u32) = get_xy_axis_pixel_origin(
-		&quadrants,
-		horizontal_pixels_used,
-		vertical_pixels_used_from_bottom,
-		canvas.dimensions(),
-	);
-	debug!("Origin axis placement {:?}", axis_origin);
 	// Pixel position showing the maximum extents of the axes
 	let (axis_min, axis_max): ((u32, u32), (u32, u32)) = get_xy_axis_pixel_min_max(
 		&quadrants,
-		axis_origin,
-		vertical_pixels_used_from_top,
+		canvas_edges_used.v_space_from_top,
+		canvas_edges_used.h_space_from_right,
+		canvas_edges_used.v_space_from_bottom,
+		canvas_edges_used.h_space_from_left,
 		legend_scale_factor,
 		canvas.dimensions(),
 		scatter.x_axis_resolution,
@@ -141,6 +179,9 @@ pub fn scatter_builder(path: &str, output: &str, csv_delimiter: &str) {
 	);
 	debug!("Minimum axis placement {:?}", axis_min);
 	debug!("Maximun axis placement {:?}", axis_max);
+	// Pixel position of axes origin can be determined from the min-max intersection
+	let axis_origin: (u32, u32) = get_xy_axis_pixel_origin(&quadrants, axis_min, axis_max);
+	debug!("Origin axis placement {:?}", axis_origin);
 	// We need to know how the csv data scales to the length of axes for plotting,
 	// ie. we need a scale factor of how many units of data there is to one pixel
 	// First we need the axis length
@@ -161,6 +202,7 @@ pub fn scatter_builder(path: &str, output: &str, csv_delimiter: &str) {
 	debug!("Y-axis scale factor {}", y_axis_data_scale_factor);
 
 	draw_xy_axes(
+		&quadrants,
 		&mut canvas,
 		axis_origin,
 		axis_min,

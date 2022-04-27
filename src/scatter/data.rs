@@ -1,9 +1,12 @@
 //!
 
 use image::{ImageBuffer, Rgba};
-use tracing::{error, debug};
+use tracing::{debug, error};
 
-use crate::{data::load_data, canvas::{plot::DataPoint, legend::LegendField}};
+use crate::{
+	canvas::{legend::LegendField, plot::DataPoint},
+	data::load_data,
+};
 
 use super::DataSet;
 
@@ -18,7 +21,7 @@ pub fn get_data_bounds(data_set: &Vec<DataSet>, csv_delimiter: &str) -> ((f32, f
 	let mut max_ux = Some(f32::MIN); // TODO: unused at present
 	let mut max_y = f32::MIN;
 	let mut max_uy = Some(f32::MIN); // TODO: unused at present
-							// iterate over each set
+								 // iterate over each set
 	for set in data_set.iter() {
 		// read the csv each set corresponds to
 		let data = load_data(set.data_path.as_str(), set.has_headers, csv_delimiter);

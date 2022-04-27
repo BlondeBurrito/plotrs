@@ -5,7 +5,7 @@ Scatter(
 	x_axis_resolution: 11, // Number of times the x-axis will be divided to show your data scale. Advised to make it a ratio of your largest x value
 	y_axis_label: "Energy (kJ)",
 	y_axis_resolution: 11, // Number of times the y-axis will be divided to show your data scale. Advised to make it a ratio of your largest y value
-	has_grid: false, // Should the graph have a light grey background grid
+	has_grid: true, // Should the graph have a light grey background grid
 	has_legend: false, // should a legend be generated? Only really useful with multiple data sets
 	// data sets can be sourced from the same csv or from different ones and each can be configured with different colours/symbols
 	data_sets: [

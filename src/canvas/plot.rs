@@ -229,10 +229,19 @@ impl DataPoint {
 	) {
 		trace!("Drawing point {:?}", self);
 		let rgba = Colour::get_pixel_colour(self.colour);
-		let x_pixel_corrected_pos = axes_origin.0 + (self.x * x_scale_factor) as u32;
+		let x_pixel_corrected_pos = if self.x > 0.0 {
+			axes_origin.0 + (self.x * x_scale_factor) as u32
+		} else {
+			axes_origin.0 - (-self.x * x_scale_factor) as u32
+		};
+		// let x_pixel_corrected_pos = axes_origin.0 + (self.x * x_scale_factor) as u32;
 		// note pixel postions on a axes_origin are from top-left corner origin so additionally adjust y position based
 		// on canvas height by minusing the offset to centre it at the axis origin and then minus scaled pixels
-		let y_pixel_corrected_pos = axes_origin.1 - (self.y * y_scale_factor) as u32;
+		let y_pixel_corrected_pos = if self.y > 0.0 {
+			axes_origin.1 - (self.y * y_scale_factor) as u32
+		} else {
+			axes_origin.1 + (-self.y * y_scale_factor) as u32
+		};
 		trace!(
 			"Plotting data point ({}, {}) with pixel position ({}, {})",
 			self.x,

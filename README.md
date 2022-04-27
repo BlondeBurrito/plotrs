@@ -5,10 +5,6 @@
 [![MIT/Apache 2.0](https://img.shields.io/badge/license-MIT%2FApache-blue.svg)](./LICENSE)
 [![Crates.io](https://img.shields.io/crates/d/plotrs.svg)](https://crates.io/crates/plotrs)
 
-todo: quadrant examples
-todo: add error bars to scatter full as the showcase example in top of readme
-todo: checked sub and addition to ensure pixel u32s are not overflowing maybe?
-
 # plotrs
 
 A CLI app for plotting csv data sets onto a graph. It works by reading a graph definition from a `.ron` file, then extracts data from one or more csv files and produces a `.png` image.
@@ -198,6 +194,20 @@ You can also indicate uncertainty with the use of error bars which can be specif
 <img src="examples/scatter_error_bars/we_have_some_certainty_in_y.png" alt="s" width="800"/>
 <img src="examples/scatter_error_bars/we_have_some_certainty_in_x_and_y.png" alt="s" width="800"/>
 
+### [Quadrants Derived From Data](https://github.com/BlondeBurrito/plotrs/tree/main/examples/scatter_quadrants)
+
+Based on the range of values across a given number of data sets the cartesian quadrants required are determined during exection with scale markings and axis labels moved appropriately.
+
+<img src="examples/scatter_quadrants/top_right_quadrant_example.png" alt="s" width="300"/>
+<img src="examples/scatter_quadrants/top_left_quadrant_example.png" alt="s" width="300"/>
+<img src="examples/scatter_quadrants/bottom_right_quadrant_example.png" alt="s" width="300"/>
+<img src="examples/scatter_quadrants/bottom_left_quadrant_example.png" alt="s" width="300"/>
+<img src="examples/scatter_quadrants/top_pair_quadrant_example.png" alt="s" width="300"/>
+<img src="examples/scatter_quadrants/bottom_pair_quadrant_example.png" alt="s" width="300"/>
+<img src="examples/scatter_quadrants/left_pair_quadrant_example.png" alt="s" width="300"/>
+<img src="examples/scatter_quadrants/right_pair_quadrant_example.png" alt="s" width="300"/>
+<img src="examples/scatter_quadrants/all_quadrants_example.png" alt="s" width="300"/>
+
 ## Contributing
 
 * Fork it
@@ -213,3 +223,6 @@ You can also indicate uncertainty with the use of error bars which can be specif
 * Negative axes
 * Show BestFit types in legend
 * Allow overriding font
+* quadrant examples
+* add error bars to scatter full as the showcase example in top of readme
+* checked sub and addition to ensure pixel u32s are not overflowing maybe?
