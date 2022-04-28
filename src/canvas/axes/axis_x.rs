@@ -30,7 +30,7 @@ pub fn build_x_axis_label(
 	let width = get_width_of_glyphs(&glyphs);
 	let height = get_maximum_height_of_glyphs(&glyphs);
 	match quadrants {
-		Quadrants::RightPair => {
+		Quadrants::RightPair | Quadrants::AllQuadrants => {
 			debug!("Placing x-axis label in centre right");
 			let position: (u32, u32) = (
 				canvas.dimensions().0 - CANVAS_BORDER_PIXELS - width - horizontal_pixels_from_right,
@@ -62,7 +62,7 @@ pub fn build_x_axis_label(
 				h_space_from_right: width + CANVAS_BORDER_PIXELS,
 			}
 		}
-		Quadrants::TopPair => {
+		Quadrants::TopPair | Quadrants::TopRight => {
 			debug!("Placing x-axis label in bottom right corner");
 			let position: (u32, u32) = (
 				canvas.dimensions().0 - CANVAS_BORDER_PIXELS - width - horizontal_pixels_from_right,
@@ -76,7 +76,7 @@ pub fn build_x_axis_label(
 				h_space_from_right: width + CANVAS_BORDER_PIXELS,
 			}
 		}
-		Quadrants::BottomPair => {
+		Quadrants::BottomPair | Quadrants::BottomRight => {
 			debug!("Placing x-axis label in top right corner");
 			let position: (u32, u32) = (
 				canvas.dimensions().0 - horizontal_pixels_from_right - width,
@@ -87,38 +87,6 @@ pub fn build_x_axis_label(
 				v_space_from_top: height + CANVAS_BORDER_PIXELS,
 				h_space_from_left: 0,
 				v_space_from_bottom: 0,
-				h_space_from_right: width + CANVAS_BORDER_PIXELS,
-			}
-		}
-		Quadrants::AllQuadrants => {
-			debug!("Placing x-axis label in centre right");
-			let position: (u32, u32) = (
-				canvas.dimensions().0
-					- CANVAS_BORDER_PIXELS
-					- (width) - horizontal_pixels_from_right,
-				(canvas.dimensions().1 - vertical_pixels_from_top - vertical_pixels_from_bottom)
-					/ 2 + vertical_pixels_from_top
-					+ height,
-			);
-			draw_glyphs(canvas, BLACK, glyphs, position);
-			VHConsumedCanvasSpace {
-				v_space_from_top: 0,
-				h_space_from_left: width + CANVAS_BORDER_PIXELS,
-				v_space_from_bottom: 0,
-				h_space_from_right: width + CANVAS_BORDER_PIXELS,
-			}
-		}
-		Quadrants::TopRight => {
-			debug!("Placing x-axis label in bottom right corner");
-			let position: (u32, u32) = (
-				canvas.dimensions().0 - CANVAS_BORDER_PIXELS - width - horizontal_pixels_from_right,
-				canvas.dimensions().1 - CANVAS_BORDER_PIXELS - height,
-			);
-			draw_glyphs(canvas, BLACK, glyphs, position);
-			VHConsumedCanvasSpace {
-				v_space_from_top: 0,
-				h_space_from_left: 0,
-				v_space_from_bottom: CANVAS_BORDER_PIXELS + height + CANVAS_BORDER_PIXELS,
 				h_space_from_right: width + CANVAS_BORDER_PIXELS,
 			}
 		}
@@ -134,20 +102,6 @@ pub fn build_x_axis_label(
 				h_space_from_left: width + CANVAS_BORDER_PIXELS,
 				v_space_from_bottom: CANVAS_BORDER_PIXELS + (height * 2) + CANVAS_BORDER_PIXELS,
 				h_space_from_right: 0,
-			}
-		}
-		Quadrants::BottomRight => {
-			debug!("Placing x-axis label in top left corner");
-			let position: (u32, u32) = (
-				canvas.dimensions().0 - horizontal_pixels_from_right - width,
-				vertical_pixels_from_top + CANVAS_BORDER_PIXELS + height,
-			);
-			draw_glyphs(canvas, BLACK, glyphs, position);
-			VHConsumedCanvasSpace {
-				v_space_from_top: height + CANVAS_BORDER_PIXELS,
-				h_space_from_left: 0,
-				v_space_from_bottom: 0,
-				h_space_from_right: width + CANVAS_BORDER_PIXELS,
 			}
 		}
 		Quadrants::BottomLeft => {

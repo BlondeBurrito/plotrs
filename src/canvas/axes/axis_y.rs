@@ -30,12 +30,10 @@ pub fn build_y_axis_label(
 	let width = get_width_of_glyphs(&glyphs);
 	let height = get_maximum_height_of_glyphs(&glyphs);
 	match quadrants {
-		Quadrants::RightPair => {
+		Quadrants::RightPair | Quadrants::TopRight => {
 			debug!("Placing y-axis label in top left corner");
 			let position: (u32, u32) = (CANVAS_BORDER_PIXELS, vertical_pixels_from_top);
 			draw_glyphs(canvas, BLACK, glyphs, position);
-			// return value of vertical space used is based on glyph height with a border
-			// horizontal space ensures room for drawing scale markings/glyphs
 			VHConsumedCanvasSpace {
 				v_space_from_top: height + CANVAS_BORDER_PIXELS,
 				h_space_from_left: width + CANVAS_BORDER_PIXELS,
@@ -43,15 +41,13 @@ pub fn build_y_axis_label(
 				h_space_from_right: 0,
 			}
 		}
-		Quadrants::LeftPair => {
+		Quadrants::LeftPair | Quadrants::TopLeft => {
 			debug!("Placing y-axis label in top right corner");
 			let position: (u32, u32) = (
 				canvas.dimensions().0 - width - CANVAS_BORDER_PIXELS - horizontal_pixels_from_right,
 				vertical_pixels_from_top,
 			);
 			draw_glyphs(canvas, BLACK, glyphs, position);
-			// return value of vertical space used is based on glyph height with a border
-			// horizontal space ensures room for drawing scale markings/glyphs
 			VHConsumedCanvasSpace {
 				v_space_from_top: height + CANVAS_BORDER_PIXELS,
 				h_space_from_left: 0,
@@ -59,14 +55,13 @@ pub fn build_y_axis_label(
 				h_space_from_right: width + CANVAS_BORDER_PIXELS,
 			}
 		}
-		Quadrants::TopPair => {
+		Quadrants::TopPair | Quadrants::AllQuadrants => {
 			debug!("Placing y-axis label in middle top area");
 			let position: (u32, u32) = (
 				(canvas.dimensions().0 / 2) - (width / 2),
 				vertical_pixels_from_top,
 			);
 			draw_glyphs(canvas, BLACK, glyphs, position);
-			// return value of vertical space used is based on glyph height with a border
 			VHConsumedCanvasSpace {
 				v_space_from_top: height + CANVAS_BORDER_PIXELS,
 				h_space_from_left: 0,
@@ -87,50 +82,6 @@ pub fn build_y_axis_label(
 				h_space_from_left: 0,
 				v_space_from_bottom: height + CANVAS_BORDER_PIXELS,
 				h_space_from_right: 0,
-			}
-		}
-		Quadrants::AllQuadrants => {
-			debug!("Placing y-axis label in middle top area");
-			let position: (u32, u32) = (
-				(canvas.dimensions().0 / 2) - (width / 2),
-				vertical_pixels_from_top,
-			);
-			draw_glyphs(canvas, BLACK, glyphs, position);
-			// return value of vertical space used is based on glyph height with a border
-			VHConsumedCanvasSpace {
-				v_space_from_top: height + CANVAS_BORDER_PIXELS,
-				h_space_from_left: 0,
-				v_space_from_bottom: CANVAS_BORDER_PIXELS,
-				h_space_from_right: 0,
-			}
-		}
-		Quadrants::TopRight => {
-			debug!("Placing y-axis label in top left corner");
-			let position: (u32, u32) = (CANVAS_BORDER_PIXELS, vertical_pixels_from_top);
-			draw_glyphs(canvas, BLACK, glyphs, position);
-			// return value of vertical space used is based on glyph height with a border
-			// horizontal space ensures room for drawing scale markings/glyphs
-			VHConsumedCanvasSpace {
-				v_space_from_top: height + CANVAS_BORDER_PIXELS,
-				h_space_from_left: width + CANVAS_BORDER_PIXELS,
-				v_space_from_bottom: 0,
-				h_space_from_right: 0,
-			}
-		}
-		Quadrants::TopLeft => {
-			debug!("Placing y-axis label in top right corner");
-			let position: (u32, u32) = (
-				canvas.dimensions().0 - width - CANVAS_BORDER_PIXELS - horizontal_pixels_from_right,
-				vertical_pixels_from_top,
-			);
-			draw_glyphs(canvas, BLACK, glyphs, position);
-			// return value of vertical space used is based on glyph height with a border
-			// horizontal space ensures room for drawing scale markings/glyphs
-			VHConsumedCanvasSpace {
-				v_space_from_top: height + CANVAS_BORDER_PIXELS,
-				h_space_from_left: 0,
-				v_space_from_bottom: 0,
-				h_space_from_right: width + CANVAS_BORDER_PIXELS,
 			}
 		}
 		Quadrants::BottomRight => {
