@@ -10,7 +10,7 @@ A CLI app for plotting csv data sets onto a graph. It works by reading a graph d
 
 <img src="examples/scatter_full/showcasing_a_bunch_of_cool_features.png" alt="s" width="800"/>
 
-Back in the mists of time I used to use [GNU Octave](https://www.gnu.org/software/octave/index) for plotting data about plasmonic absorption and photovoltaic-thermoelectric currents. As part of my Rust jounrey I thought I'd try writting a program for plotting data points in a similar style.
+Back in the mists of time I used to use [GNU Octave](https://www.gnu.org/software/octave/index) for plotting data about plasmonic absorption and photovoltaic-thermoelectric currents. As part of my Rust journey I thought I'd try writting a program for plotting data points in a similar style.
 
 ## Features
 
