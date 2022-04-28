@@ -2,7 +2,19 @@
 
 All notable changes to this project will be documented in this file with the power of `git-cliff` changelog generation.
 
+## [0.1.3] - 2022-04-28
+
+### Bug Fixes
+
+- Git cliff tag matching now locates existing tags
+
 ## [0.1.2] - 2022-04-28
+
+### Bug Fixes
+
+- Set cargo metadata categories
+
+## [0.1.0] - 2022-04-28
 
 ### Bug Fixes
 
@@ -13,7 +25,6 @@ All notable changes to this project will be documented in this file with the pow
 - X-axis scale markers now sit outside the axis in whitespace when negative y range is dominant
 - Reposition y axis scale markers to avoid graph overlap and make use of free whitespace
 - Axis scale text no longer overlays where negative and positive axes meet
-- Set cargo metadata categories
 
 ### Documentation
 
