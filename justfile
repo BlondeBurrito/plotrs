@@ -66,6 +66,34 @@ generate-examples +VERBOSE='-v': install
   cd examples/scatter_best_fit/; plotrs -g scatter -c cubic.ron -o . {{VERBOSE}}
   cd examples/scatter_best_fit/; plotrs -g scatter -c polynomial.ron -o . {{VERBOSE}}
   cd examples/scatter_best_fit/; plotrs -g scatter -c exponential.ron -o . {{VERBOSE}}
+  cd examples/scatter_best_fit/; plotrs -g scatter -c gaussian.ron -o . {{VERBOSE}}
   cd examples/scatter_best_fit/; plotrs -g scatter -c sin.ron -o . {{VERBOSE}}
   cd examples/scatter_best_fit/; plotrs -g scatter -c cos.ron -o . {{VERBOSE}}
   cd examples/scatter_full/; plotrs -g scatter -c scatter.ron -o . {{VERBOSE}}
+  cd examples/scatter_quadrants/; plotrs -g scatter -c top_right.ron -o . {{VERBOSE}}
+  cd examples/scatter_quadrants/; plotrs -g scatter -c top_left.ron -o . {{VERBOSE}}
+  cd examples/scatter_quadrants/; plotrs -g scatter -c bottom_left.ron -o . {{VERBOSE}}
+  cd examples/scatter_quadrants/; plotrs -g scatter -c bottom_right.ron -o . {{VERBOSE}}
+  cd examples/scatter_quadrants/; plotrs -g scatter -c top_pair.ron -o . {{VERBOSE}}
+  cd examples/scatter_quadrants/; plotrs -g scatter -c bottom_pair.ron -o . {{VERBOSE}}
+  cd examples/scatter_quadrants/; plotrs -g scatter -c left_pair.ron -o . {{VERBOSE}}
+  cd examples/scatter_quadrants/; plotrs -g scatter -c right_pair.ron -o . {{VERBOSE}}
+  cd examples/scatter_quadrants/; plotrs -g scatter -c all_quadrants.ron -o . {{VERBOSE}}
+# Useful tools
+dev-tools:
+  cargo install loc;
+  cargo install git-cliff;
+  cargo install flamegraph;
+  cargo install cargo-bloat;
+  cargo install cargo-deadlinks;
+  cargo install cargo-geiger;
+  cargo install cargo-modules;
+  cargo install --locked cargo-outdated;
+  cargo install cargo-watch;
+  cargo install hyperfine;
+  cargo install rust-script;
+  rust-script --install-file-association;
+  cargo install --locked cargo-deny
+
+prepare-release: build clippy doc-coverage
+  cargo deny check;

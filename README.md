@@ -17,6 +17,7 @@ A CLI app for plotting csv data sets onto a graph. It works by reading a graph d
 * Graph element/component positions and sizes are dynamically calculated based on the size of the image you want
 * Multiple colours and symbols can be used to plot data sets
 * Data can be sourced from one or more csv files - you're simply targeting certain columns in a given file for extraction
+* Error bars - plot uncertainty in `x` and `y` singly or jointly
 
 ## Install
 
@@ -72,6 +73,15 @@ Scatter(
 )
 ```
 
+Where your `csv` data may look like (note the lack of whitespace between columns!):
+
+```csv
+x,y
+0.5,0.5
+1.0,1.0
+1.5,1.5
+```
+
 ## Symbol Types
 
 The following symbols can be used for plotted data points:
@@ -82,7 +92,9 @@ The following symbols can be used for plotted data points:
 * Square
 * Point
 
-## Best Fit Schemas
+## [Best Fit Schemas](https://github.com/BlondeBurrito/plotrs/tree/main/examples/scatter_best_fit)
+
+Each data set definition can also specify a Best Fit line to be drawn. In the examples below the data sets are tiny and the symbols are coloured white to hide them in the background canvas, they really just define the extent of the axes to show case overlaying a Best Fit.
 
 ### Linear
 
@@ -142,6 +154,16 @@ y = (constant * base.powf(power * x)) + vertical_shift;
 
 <img src="examples/scatter_best_fit/exponential_best_fit.png" alt="s" width="210"/>
 
+### Gaussian
+
+```rust
+`y = (variance * (2.0 * PI).sqrt()).powf(-1.0) * E.powf(-(x - expected_value).powf(2.0) / (2.0 * variance.powf(2.0)))`
+```
+
+`Some(Gaussian(expected_value: 5.0, variance: 0.2, colour: Black))`
+
+<img src="examples/scatter_best_fit/gaussian_best_fit.png" alt="s" width="210"/>
+
 ### Sinusoidal
 
 ```rust
@@ -193,6 +215,12 @@ You can also indicate uncertainty with the use of error bars which can be specif
 <img src="examples/scatter_error_bars/we_have_some_certainty_in_y.png" alt="s" width="800"/>
 <img src="examples/scatter_error_bars/we_have_some_certainty_in_x_and_y.png" alt="s" width="800"/>
 
+### [Quadrants Derived From Data](https://github.com/BlondeBurrito/plotrs/tree/main/examples/scatter_quadrants)
+
+Based on the range of values across a given number of data sets the cartesian quadrants required are determined during exection with scale markings and axis labels moved appropriately.
+
+<img src="examples/scatter_quadrants/top_right_quadrant_example.png" alt="s" width="300"/><img src="examples/scatter_quadrants/top_left_quadrant_example.png" alt="s" width="300"/><img src="examples/scatter_quadrants/bottom_right_quadrant_example.png" alt="s" width="300"/><img src="examples/scatter_quadrants/bottom_left_quadrant_example.png" alt="s" width="300"/><img src="examples/scatter_quadrants/top_pair_quadrant_example.png" alt="s" width="300"/><img src="examples/scatter_quadrants/bottom_pair_quadrant_example.png" alt="s" width="300"/><img src="examples/scatter_quadrants/left_pair_quadrant_example.png" alt="s" width="300"/><img src="examples/scatter_quadrants/right_pair_quadrant_example.png" alt="s" width="300"/><img src="examples/scatter_quadrants/all_quadrants_example.png" alt="s" width="300"/>
+
 ## Contributing
 
 * Fork it
@@ -205,6 +233,6 @@ You can also indicate uncertainty with the use of error bars which can be specif
 
 ## TODO
 
-* Negative axes
 * Show BestFit types in legend
 * Allow overriding font
+* checked sub and addition to ensure pixel u32s are not overflowing maybe?

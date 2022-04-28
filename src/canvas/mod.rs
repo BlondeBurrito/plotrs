@@ -10,9 +10,43 @@ pub mod best_fit;
 pub mod glyphs;
 pub mod legend;
 pub mod plot;
+pub mod quadrants;
 pub mod title;
+/// Vertical and horizontal pixel border used for spacing elements
+pub const CANVAS_BORDER_PIXELS: u32 = 10;
+/// Describes the amount of horizontal and vertical canvas pixel space that has been consumed from graph elements such as legend, labels and title.
+/// The final form of this data describes the size of the pixel area avaialble for drawing the axes
+pub struct VHConsumedCanvasSpace {
+	/// The amount of vertical pixel space occupied from the top border descending downwards
+	pub v_space_from_top: u32,
+	/// The amount of horizontal pixel space occupied from the right border progressing rightwards
+	pub h_space_from_right: u32,
+	/// The amount of vertical pixel space occupied from the bottom border ascending upwards
+	pub v_space_from_bottom: u32,
+	/// The amount of horizontal pixel space occupied from the left border progressing leftwards
+	pub h_space_from_left: u32,
+}
 
-/// Create a blank canvas which can be mutated with content
+impl VHConsumedCanvasSpace {
+	/// Instantiate a new `VHConsumedCanvasSpace` with default values of `CANVAS_BORDER_PIXELS`
+	pub fn new() -> VHConsumedCanvasSpace {
+		VHConsumedCanvasSpace {
+			v_space_from_top: CANVAS_BORDER_PIXELS,
+			h_space_from_right: CANVAS_BORDER_PIXELS,
+			v_space_from_bottom: CANVAS_BORDER_PIXELS,
+			h_space_from_left: CANVAS_BORDER_PIXELS,
+		}
+	}
+	/// Adds `VHConsumedCanvasSpace` to the calling `VHConsumedCanvasSpace`
+	pub fn add(&mut self, increment: VHConsumedCanvasSpace) {
+		self.v_space_from_top += increment.v_space_from_top;
+		self.h_space_from_left += increment.h_space_from_left;
+		self.v_space_from_bottom += increment.v_space_from_bottom;
+		self.h_space_from_right += increment.h_space_from_right;
+	}
+}
+
+/// Create a blank canvas which can be mutated with content. By default all pixels are coloured white
 pub fn draw_base_canvas(canvas_pixel_size: (u32, u32)) -> ImageBuffer<Rgba<u8>, Vec<u8>> {
 	// create a new image buffer based on `canvas_pixel_size`
 	let mut imgbuf = RgbaImage::new(canvas_pixel_size.0, canvas_pixel_size.1);
@@ -21,10 +55,10 @@ pub fn draw_base_canvas(canvas_pixel_size: (u32, u32)) -> ImageBuffer<Rgba<u8>, 
 	for pixel in imgbuf.pixels_mut() {
 		*pixel = image::Rgba(WHITE);
 	}
-	return imgbuf;
+	imgbuf
 }
 
-/// Save finished image to disk
+/// Save finished image to disk where the file name is taken from the title of the graph
 pub fn save_image(imgbuf: ImageBuffer<Rgba<u8>, Vec<u8>>, output_path: &str, title: String) {
 	let re = Regex::new(r"\s|\W").unwrap();
 	let file_name = re.replace_all(title.as_str(), "_").to_lowercase();

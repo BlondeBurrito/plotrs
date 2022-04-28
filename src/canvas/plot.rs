@@ -1,4 +1,4 @@
-//!
+//! Draws data points and optional uncertainty/error bars onto a canvas with given symbols and colours
 
 use image::{ImageBuffer, Rgba};
 use serde::Deserialize;
@@ -8,6 +8,7 @@ use crate::colours::Colour;
 
 /// The shape a plotted data point should take
 #[derive(Debug, Deserialize, Copy, Clone)]
+#[allow(clippy::missing_docs_in_private_items)]
 pub enum DataSymbol {
 	Cross,
 	Circle,
@@ -195,7 +196,7 @@ impl DataSymbol {
 				pixel_coords.push(origin);
 			}
 		}
-		return pixel_coords;
+		pixel_coords
 	}
 }
 
@@ -220,6 +221,7 @@ pub struct DataPoint {
 	pub symbol_thickness: u32,
 }
 impl DataPoint {
+	/// Draws a data point onto the canvas with a given symbol and scales its size against the number of pixels available
 	pub fn draw_point(
 		self,
 		canvas: &mut ImageBuffer<Rgba<u8>, Vec<u8>>,
@@ -229,10 +231,17 @@ impl DataPoint {
 	) {
 		trace!("Drawing point {:?}", self);
 		let rgba = Colour::get_pixel_colour(self.colour);
-		let x_pixel_corrected_pos = axes_origin.0 + (self.x * x_scale_factor) as u32;
-		// note pixel postions on a axes_origin are from top-left corner origin so additionally adjust y position based
-		// on canvas height by minusing the offset to centre it at the axis origin and then minus scaled pixels
-		let y_pixel_corrected_pos = axes_origin.1 - (self.y * y_scale_factor) as u32;
+		let x_pixel_corrected_pos = if self.x > 0.0 {
+			axes_origin.0 + (self.x * x_scale_factor) as u32
+		} else {
+			axes_origin.0 - (-self.x * x_scale_factor) as u32
+		};
+		// note pixel postions use an origin based from top-left corner so to draw them in the human-like axis_origin we flip the signs for y
+		let y_pixel_corrected_pos = if self.y > 0.0 {
+			axes_origin.1 - (self.y * y_scale_factor) as u32
+		} else {
+			axes_origin.1 + (-self.y * y_scale_factor) as u32
+		};
 		trace!(
 			"Plotting data point ({}, {}) with pixel position ({}, {})",
 			self.x,
@@ -246,6 +255,7 @@ impl DataPoint {
 			self.symbol_thickness,
 			self.symbol_radius,
 		);
+		// Draw the symbol for a data point
 		for (px, py) in pixels_in_shape.iter() {
 			match canvas.get_pixel_mut_checked(*px, *py) {
 				Some(pixel) => *pixel = Rgba(rgba),
@@ -255,6 +265,7 @@ impl DataPoint {
 				),
 			}
 		}
+		// Draw uncertainty bars
 		match self.ux {
 			Some(value) => {
 				trace!("Drawing x uncertainty with size {}", value);
@@ -317,6 +328,7 @@ impl DataPoint {
 			}
 			None => {}
 		}
+		// Draw uncertainty bars
 		match self.uy {
 			Some(value) => {
 				trace!("Drawing y uncertainty with size {}", value);

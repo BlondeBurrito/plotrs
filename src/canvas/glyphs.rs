@@ -1,4 +1,4 @@
-//!
+//! Calculation of font sizes, vectors of glyphs, drawing of glyphs and helper methods to find glyph height and width to assist in positioning text on a canvas
 
 use image::{ImageBuffer, Rgba};
 use rusttype::{point, Font, PositionedGlyph, Scale};
@@ -8,9 +8,13 @@ use crate::colours::*;
 
 /// Font sizes for the different elements of a graph
 pub struct FontSizes {
+	/// Size of the title font
 	pub title_font_size: f32,
+	/// Size of the axis font
 	pub axis_font_size: f32,
+	/// Size of the axis scale markings font
 	pub axis_unit_font_size: f32,
+	/// Size of the legend font
 	pub legend_font_size: f32,
 }
 
@@ -34,10 +38,10 @@ impl FontSizes {
 		//TODO: is there a better way to calc legend font size?
 		let legend_font_size = axis_font_size;
 		FontSizes {
-			title_font_size: title_font_size,
-			axis_font_size: axis_font_size,
-			axis_unit_font_size: axis_unit_font_size,
-			legend_font_size: legend_font_size,
+			title_font_size,
+			axis_font_size,
+			axis_unit_font_size,
+			legend_font_size,
 		}
 	}
 }
@@ -55,7 +59,9 @@ pub fn create_glyphs<'a>(
 	font.layout(text, scale, point(0.0, 0.0 + v_metrics.ascent))
 		.collect()
 }
-/// Draws glyphs onto the canvas at a given position
+/// Draws glyphs onto the canvas at a given position.
+/// Note that the position is taken to be the top left corner of the starting glyph, so their height
+/// extends downwards and width extends to the right
 pub fn draw_glyphs(
 	canvas: &mut ImageBuffer<Rgba<u8>, Vec<u8>>,
 	colour: [u8; 4],
@@ -87,4 +93,28 @@ pub fn draw_glyphs(
 			*pixel = Rgba(WHITE);
 		}
 	}
+}
+/// From a vector of glyphs find the maximum glyph height
+pub fn get_maximum_height_of_glyphs(glyphs: &[PositionedGlyph]) -> u32 {
+	let min_y = glyphs
+		.first()
+		.map(|g| g.pixel_bounding_box().unwrap().min.y)
+		.unwrap();
+	let max_y = glyphs
+		.last()
+		.map(|g| g.pixel_bounding_box().unwrap().max.y)
+		.unwrap();
+	(max_y - min_y) as u32
+}
+/// From a vector of glyphs find the total width
+pub fn get_width_of_glyphs(glyphs: &[PositionedGlyph]) -> u32 {
+	let min_x = glyphs
+		.first()
+		.map(|g| g.pixel_bounding_box().unwrap().min.x)
+		.unwrap();
+	let max_x = glyphs
+		.last()
+		.map(|g| g.pixel_bounding_box().unwrap().max.x)
+		.unwrap();
+	(max_x - min_x) as u32
 }

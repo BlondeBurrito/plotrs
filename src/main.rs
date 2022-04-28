@@ -1,21 +1,45 @@
-//! A CLI app for plotting a data set onto a variety of graphs
+//! A CLI app for plotting csv data sets onto a graph. It works by reading a graph definition from a `.ron` file, then extracts data from one or more csv files and produces a `.png` image.
+//!
+//! ## Features
+//!
+//! * Overlay best fit curves onto your graph
+//! * Graph element/component positions and sizes are dynamically calculated based on the size of the image you want
+//! * Multiple colours and symbols can be used to plot data sets
+//! * Data can be sourced from one or more csv files - you're simply targeting certain columns in a given file for extraction
+//! * Error bars - plot uncertainty in `x` and `y` singly or jointly
+//!
+//! ## Install
+//!
+//! `cargo install plotrs`
+//!
+//! ## How To Use
+//!
+//! Create a `.ron` file containing the configuration of your desired chart and generate a `png` with:
+//!
+//! ```bash
+//! plotrs -g <graph_type> -c <path_to_config_ron_file> -o <dir_for_output_png>
+//! ```
+//!
+//! E.g
+//!
+//! ```bash
+//! plotrs -g scatter -c scatter_config.ron -o here/please
+//! ```
 
 use clap::Parser;
 use font_kit::{
 	family_name::FamilyName, handle::Handle, properties::Properties, source::SystemSource,
 };
-use log;
 use rusttype::Font;
 use std::fs;
 use tracing::error;
 use tracing::{self, trace};
-use tracing_subscriber;
 mod canvas;
 mod colours;
 mod data;
 mod scatter;
 
-/// Program arguments
+/// Programme arguments
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
 struct Args {
@@ -31,10 +55,11 @@ struct Args {
 	/// Override the default csv delimiter "," with your own, e.g ";"
 	#[clap(long, default_value_t = String::from(","))]
 	csv_delimiter: String,
+	/// Set the verbosity level with a series of `v`'s, e.g `-v` or `-vv`
 	#[clap(flatten)]
 	verbose: clap_verbosity_flag::Verbosity<clap_verbosity_flag::InfoLevel>,
 }
-
+/// Process Cli arguments and call appropriate methods for graph creation
 fn main() {
 	let args = Args::parse();
 	// set various logging levels
