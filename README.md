@@ -3,7 +3,6 @@
 [![crates.io](https://img.shields.io/crates/v/plotrs.svg)](https://crates.io/crates/plotrs)
 [![docs](https://img.shields.io/badge/docs-docs.rs-orange.svg)](https://docs.rs/plotrs)
 [![MIT/Apache 2.0](https://img.shields.io/badge/license-MIT%2FApache-blue.svg)](./LICENSE)
-[![Crates.io](https://img.shields.io/crates/d/plotrs.svg)](https://crates.io/crates/plotrs)
 
 # plotrs
 
