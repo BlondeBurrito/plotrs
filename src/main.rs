@@ -1,4 +1,30 @@
-//! A CLI app for plotting a data set onto a variety of graphs
+//! A CLI app for plotting csv data sets onto a graph. It works by reading a graph definition from a `.ron` file, then extracts data from one or more csv files and produces a `.png` image.
+//! 
+//! ## Features
+//! 
+//! * Overlay best fit curves onto your graph
+//! * Graph element/component positions and sizes are dynamically calculated based on the size of the image you want
+//! * Multiple colours and symbols can be used to plot data sets
+//! * Data can be sourced from one or more csv files - you're simply targeting certain columns in a given file for extraction
+//! * Error bars - plot uncertainty in `x` and `y` singly or jointly
+//! 
+//! ## Install
+//! 
+//! `cargo install plotrs`
+//! 
+//! ## How To Use
+//! 
+//! Create a `.ron` file containing the configuration of your desired chart and generate a `png` with:
+//! 
+//! ```bash
+//! plotrs -g <graph_type> -c <path_to_config_ron_file> -o <dir_for_output_png>
+//! ```
+//! 
+//! E.g
+//! 
+//! ```bash
+//! plotrs -g scatter -c scatter_config.ron -o here/please
+//! ```
 
 use clap::Parser;
 use font_kit::{
