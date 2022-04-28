@@ -43,6 +43,7 @@ All notable changes to this project will be documented in this file.
 - Added example for each best fit curve type
 - Prototype generating relevant quadrants to build based on x-y ranges in csv data
 - All quadrants drawn in various combinations
+- Added gaussian distribution best fit type
 
 ### Miscellaneous Tasks
 
