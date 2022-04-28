@@ -92,7 +92,7 @@ The following symbols can be used for plotted data points:
 * Square
 * Point
 
-## Best Fit Schemas
+## [Best Fit Schemas](https://github.com/BlondeBurrito/plotrs/tree/main/examples/scatter_best_fit)
 
 Each data set definition can also specify a Best Fit line to be drawn. In the examples below the data sets are tiny and the symbols are coloured white to hide them in the background canvas, they really just define the extent of the axes to show case overlaying a Best Fit.
 
@@ -153,6 +153,16 @@ y = (constant * base.powf(power * x)) + vertical_shift;
 `Some(Exponential(constant: 0.5, base: 2.7, power: -1.0, vertical_shift: 3.0, colour: Black))`
 
 <img src="examples/scatter_best_fit/exponential_best_fit.png" alt="s" width="210"/>
+
+### Gaussian
+
+```rust
+`y = (variance * (2.0 * PI).sqrt()).powf(-1.0) * E.powf(-(x - expected_value).powf(2.0) / (2.0 * variance.powf(2.0)))`
+```
+
+`Some(Gaussian(expected_value: 5.0, variance: 0.2, colour: Black))`
+
+<img src="examples/scatter_best_fit/gaussian_best_fit.png" alt="s" width="210"/>
 
 ### Sinusoidal
 
@@ -225,5 +235,4 @@ Based on the range of values across a given number of data sets the cartesian qu
 
 * Show BestFit types in legend
 * Allow overriding font
-* add error bars to scatter full as the showcase example in top of readme
 * checked sub and addition to ensure pixel u32s are not overflowing maybe?

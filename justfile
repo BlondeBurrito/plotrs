@@ -66,6 +66,7 @@ generate-examples +VERBOSE='-v': install
   cd examples/scatter_best_fit/; plotrs -g scatter -c cubic.ron -o . {{VERBOSE}}
   cd examples/scatter_best_fit/; plotrs -g scatter -c polynomial.ron -o . {{VERBOSE}}
   cd examples/scatter_best_fit/; plotrs -g scatter -c exponential.ron -o . {{VERBOSE}}
+  cd examples/scatter_best_fit/; plotrs -g scatter -c gaussian.ron -o . {{VERBOSE}}
   cd examples/scatter_best_fit/; plotrs -g scatter -c sin.ron -o . {{VERBOSE}}
   cd examples/scatter_best_fit/; plotrs -g scatter -c cos.ron -o . {{VERBOSE}}
   cd examples/scatter_full/; plotrs -g scatter -c scatter.ron -o . {{VERBOSE}}

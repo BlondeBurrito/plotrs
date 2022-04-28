@@ -14,11 +14,11 @@ Scatter(
 			x_axis_csv_column: 0, // which column contains the x values
 			x_axis_error_bar_csv_column: None, // which column contains x uncertainty Some(usize) or None
 			y_axis_csv_column: 1, // which column contains the y values
-			y_axis_error_bar_csv_column: None, // which column contains y uncertainty Some(usize) or None
+			y_axis_error_bar_csv_column: Some(4), // which column contains y uncertainty Some(usize) or None
 			name: "Bunch of data", // legend will indicate which colour and symbol correspond to which data set
 			colour: Red, // the colour to render a data point
 			symbol: Square, // the shape a plotted data point should take
-			symbol_radius: 8, // The size of a drawn symbol in (1+ symbol_radius) pixels
+			symbol_radius: 5, // The size of a drawn symbol in (1+ symbol_radius) pixels
 			symbol_thickness: 2, // The thinkness of a drawn symbol in (1 + symbol_thickness) pixels
 			best_fit: Some(Cubic(intercept: 5.0, linear_coeff: -1.5, quadratic_coeff: -4.0, cubic_coeff: 2.0, colour: Black)), // A curve to fit to the axes. Some(BestFit) or None
 		),
@@ -28,7 +28,7 @@ Scatter(
 			x_axis_csv_column: 2, // which column contains the x values
 			x_axis_error_bar_csv_column: None, // which column contains x uncertainty Some(usize) or None
 			y_axis_csv_column: 3, // which column contains the y values
-			y_axis_error_bar_csv_column: None, // which column contains y uncertainty Some(usize) or None
+			y_axis_error_bar_csv_column: Some(5), // which column contains y uncertainty Some(usize) or None
 			name: "Some other data", // legend will indicate which colour and symbol correspond to which data set
 			colour: Blue, // the colour to render a data point
 			symbol: Cross, // the shape a plotted data point should take

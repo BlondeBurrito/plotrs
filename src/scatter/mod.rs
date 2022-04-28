@@ -234,9 +234,17 @@ pub fn scatter_builder(path: &str, output: &str, csv_delimiter: &str) {
 	let x_data_min_max_limits: (i32, i32) = (min_xy_scaled.0, max_xy_scaled.0);
 	let y_data_min_max_limits: (i32, i32) = (min_xy_scaled.1, max_xy_scaled.1);
 	// Now we can find the number of axis units per x and y
-	//TODO: single row data set causes divide by zero
+	// Ensure we don't divide by zero!
+	if !(max_xy_scaled.0 as f32 - min_xy_scaled.0 as f32).is_normal() {
+		error!("Difference between the smallest and largest x values have produced Zero, Infinite, NaN or a Subnormal value. Likely if your data set only contains a single row. Ensure you have multiple rows and that your largest x value minus your smallest x doesn't produce zero");
+		std::process::exit(1)
+	}
 	let x_axis_data_scale_factor: f32 =
 		x_axis_length as f32 / (max_xy_scaled.0 as f32 - min_xy_scaled.0 as f32).abs();
+	if !(max_xy_scaled.1 as f32 - min_xy_scaled.1 as f32).is_normal() {
+		error!("Difference between the smallest and largest y values have produced Zero, Infinite, NaN or a Subnormal value. Likely if your data set only contains a single row. Ensure you have multiple rows and that your largest y value minus your smallest y doesn't produce zero");
+		std::process::exit(1)
+	}
 	let y_axis_data_scale_factor: f32 =
 		y_axis_length as f32 / (max_xy_scaled.1 as f32 - min_xy_scaled.1 as f32).abs();
 	debug!("X-axis scale factor {}", x_axis_data_scale_factor);
@@ -267,7 +275,7 @@ pub fn scatter_builder(path: &str, output: &str, csv_delimiter: &str) {
 					x_data_min_max_limits.1,
 					y_data_min_max_limits.0,
 					y_data_min_max_limits.1,
-					scatter.canvas_pixel_size.0 as i32,
+					scatter.canvas_pixel_size.0 as i32 * 2,
 				);
 				let origin_offset = (axis_origin.0, axis_origin.1);
 				for p in points.iter() {

@@ -1,6 +1,9 @@
 //! Based on a type of BestFit this module will calculate the valid data points for the given axes/canvas size
 
-use std::collections::HashMap;
+use std::{
+	collections::HashMap,
+	f32::consts::{E, PI},
+};
 
 use serde::Deserialize;
 use tracing::{error, trace};
@@ -74,6 +77,17 @@ pub enum BestFit {
 		power: f32,
 		/// Vertical offset from the origin
 		vertical_shift: f32,
+		/// The colour of the best fit curve
+		colour: Colour,
+	},
+	/// Probability distribution of the form `y = (o*sqrt(2pi))^-1 * e^(-(x -u)^2/2o^2)`
+	///
+	/// `y = (variance * (2.0 * PI).sqrt()).powf(-1.0) * E.powf(-(x - expected_value).powf(2.0) / (2.0 * variance.powf(2.0)))`
+	Gaussian {
+		/// Weighted average
+		expected_value: f32,
+		/// Deviation
+		variance: f32,
 		/// The colour of the best fit curve
 		colour: Colour,
 	},
@@ -251,6 +265,37 @@ impl BestFit {
 				for scaled_x in x_min..=(x_max * scale_factor) {
 					let x = scaled_x as f32 / scale_factor as f32;
 					let y = (constant * base.powf(power * x)) + vertical_shift;
+					if y > y_min as f32 && y < y_max as f32 {
+						points.push(DataPoint {
+							x,
+							ux: None,
+							y,
+							uy: None,
+							colour: *colour,
+							symbol: DataSymbol::Point,
+							symbol_radius: 1,
+							symbol_thickness: 1,
+						});
+					}
+				}
+				points
+			}
+			BestFit::Gaussian {
+				expected_value,
+				variance,
+				colour,
+			} => {
+				trace!("Finding coordinates for Gaussian best fit line with expected_value {} and varience {}", expected_value, variance);
+				// prevvent dividing by zero
+				if !variance.is_normal() {
+					error!("Variance cannot be zero, infinite, subnormal or NaN");
+					std::process::exit(1)
+				}
+				let mut points: Vec<DataPoint> = Vec::new();
+				for scaled_x in x_min..=(x_max * scale_factor) {
+					let x = scaled_x as f32 / scale_factor as f32;
+					let y = (variance * (2.0 * PI).sqrt()).powf(-1.0)
+						* E.powf(-(x - expected_value).powf(2.0) / (2.0 * variance.powf(2.0)));
 					if y > y_min as f32 && y < y_max as f32 {
 						points.push(DataPoint {
 							x,
