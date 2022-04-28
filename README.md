@@ -82,7 +82,16 @@ x,y
 1.5,1.5
 ```
 
-## Symbol Types
+In a directory you may have:
+
+```txt
+- my_config.ron
+- data.csv
+```
+
+So to generate a `png` you'd run from within the directory `plotrs -g scatter -c my_config.ron` and it'll write a `png` next to the files.
+
+## Symbol Types/Colours
 
 The following symbols can be used for plotted data points:
 
@@ -91,6 +100,17 @@ The following symbols can be used for plotted data points:
 * Triangle
 * Square
 * Point
+
+With the following colours:
+
+* White
+* Black
+* Grey
+* Orange
+* Red
+* Blue
+* Green
+* Pink
 
 ## [Best Fit Schemas](https://github.com/BlondeBurrito/plotrs/tree/main/examples/scatter_best_fit)
 
@@ -220,6 +240,14 @@ You can also indicate uncertainty with the use of error bars which can be specif
 Based on the range of values across a given number of data sets the cartesian quadrants required are determined during exection with scale markings and axis labels moved appropriately.
 
 <img src="examples/scatter_quadrants/top_right_quadrant_example.png" alt="s" width="300"/><img src="examples/scatter_quadrants/top_left_quadrant_example.png" alt="s" width="300"/><img src="examples/scatter_quadrants/bottom_right_quadrant_example.png" alt="s" width="300"/><img src="examples/scatter_quadrants/bottom_left_quadrant_example.png" alt="s" width="300"/><img src="examples/scatter_quadrants/top_pair_quadrant_example.png" alt="s" width="300"/><img src="examples/scatter_quadrants/bottom_pair_quadrant_example.png" alt="s" width="300"/><img src="examples/scatter_quadrants/left_pair_quadrant_example.png" alt="s" width="300"/><img src="examples/scatter_quadrants/right_pair_quadrant_example.png" alt="s" width="300"/><img src="examples/scatter_quadrants/all_quadrants_example.png" alt="s" width="300"/>
+
+## Troubleshooting
+
+### The numbers along the axis are long floats overlapping one another
+
+Try changing the `x` and `y` axis resolutions to numbers which are a factor of your largest values + 10%. What happens under the hood is that the largest values in your data set are found and slightly scaled so that data points avoid being plotted directly on an axis and thus obscurring some text/markers. When an axis is drawn it has a certain length in pixels and the resolution decides how many times it gets chopped up to display scale markers. To map a data value (f32) to a pixel (u32) there is a conversion where a single pixel represents some amount or length of value data. For an awkward resolution the pixel length between two scale markers could be a long float rather than rounded whole number.
+
+E.g if the largest `x` value in your data is `10` try setting the `x_axis_resolution` to `10 * 1.1 = 11`, that should produce `11` nice scale markers with whole numbers. Likewise a resolution `22` would produce nice markers also as `11` fits into `22` snugly.
 
 ## Contributing
 
