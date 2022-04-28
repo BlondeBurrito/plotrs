@@ -7,9 +7,11 @@
 
 # plotrs
 
-A CLI app for plotting csv data sets onto a graph. It works by reading a graph definition from a `.ron` file, then extracts data from one or more csv files and produces a `.png` image.
+A CLI app for plotting csv data sets onto a graph. It works by reading a graph definition from a `.ron` file, then extracts data from one or more csv files and produces a `.png` image. Currently only scatter graphs are supported.
 
 <img src="examples/scatter_full/showcasing_a_bunch_of_cool_features.png" alt="s" width="800"/>
+
+Back in the mists of time I used to use [GNU Octave](https://www.gnu.org/software/octave/index) for plotting data about plasmonic absorption and photovoltaic-thermoelectric currents. As part of my Rust jounrey I thought I'd try writting a program for plotting data points in a similar style.
 
 ## Features
 
@@ -133,7 +135,7 @@ y = gradient * x + y_intercept
 y = intercept + (linear_coeff * x) + (quadratic_coeff * x.powf(2))
 ```
 
-`Some(Quadratic(intercept: 1.0, linear_coeff: 1.0, quadratic_coeff: 2.0, colour: Black))`
+`Some(Quadratic(intercept: 1.0, linear_coeff: 0.0, quadratic_coeff: 1.0, colour: Black))`
 
 <img src="examples/scatter_best_fit/quadratic_best_fit.png" alt="s" width="210"/>
 
@@ -163,6 +165,8 @@ The following extends the Cubic best fit into a Quartic Polynomial:
 
 `Some(GenericPolynomial(coefficients: {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: -1.0}, colour: Black))`
 
+Which to the human eye kinda looks like: `1 + x + x^2 + x^3 - x^4`.
+
 <img src="examples/scatter_best_fit/generic_polynomial_best_fit.png" alt="s" width="210"/>
 
 ### Exponential
@@ -181,7 +185,7 @@ y = (constant * base.powf(power * x)) + vertical_shift;
 `y = (variance * (2.0 * PI).sqrt()).powf(-1.0) * E.powf(-(x - expected_value).powf(2.0) / (2.0 * variance.powf(2.0)))`
 ```
 
-`Some(Gaussian(expected_value: 5.0, variance: 0.2, colour: Black))`
+`Some(Gaussian(expected_value: 0.0, variance: 0.3, colour: Black))`
 
 <img src="examples/scatter_best_fit/gaussian_best_fit.png" alt="s" width="210"/>
 
@@ -256,6 +260,7 @@ Try increasing the size of your canvas if the edges of the text become blurry.
 
 ## Contributing
 
+* If you're unsure about something raise an issue first
 * Fork it
 * Tippy tap your keyboard
 * Submit a PR
@@ -270,3 +275,4 @@ Try increasing the size of your canvas if the edges of the text become blurry.
 * Allow overriding font
 * checked sub and addition to ensure pixel u32s are not overflowing maybe?
 * Split/simplify drawing methods out and then add a billion tests, many around position calculations
+* What methods/modules can be reused to draw other graph types...

@@ -149,7 +149,7 @@ impl BestFit {
 			} => {
 				trace!("Finding coordinates for Linear best fit line with gradient {}, y_intercept {} and between ({}, {}) and ({}, {})", gradient, y_intercept, x_min, y_min, x_max, y_max);
 				let mut points: Vec<DataPoint> = Vec::new();
-				for scaled_x in x_min..=(x_max * scale_factor) {
+				for scaled_x in (x_min * scale_factor)..=(x_max * scale_factor) {
 					let x = scaled_x as f32 / scale_factor as f32;
 					let y = (*gradient * x) + *y_intercept;
 					if y > y_min as f32 && y < y_max as f32 {
@@ -175,7 +175,7 @@ impl BestFit {
 			} => {
 				trace!("Finding coordinates for Quadratic best fit line with intercept {}, linear coefficient {} and quadratic coefficient {}", intercept, linear_coeff, quadratic_coeff);
 				let mut points: Vec<DataPoint> = Vec::new();
-				for scaled_x in x_min..=(x_max * scale_factor) {
+				for scaled_x in (x_min * scale_factor)..=(x_max * scale_factor) {
 					let x = scaled_x as f32 / scale_factor as f32;
 					let y = intercept + (linear_coeff * x) + (quadratic_coeff * x.powf(2.0));
 					if y > y_min as f32 && y < y_max as f32 {
@@ -202,7 +202,7 @@ impl BestFit {
 			} => {
 				trace!("Finding coordinates for Cubic best fit line with intercept {}, linear coefficient {}, quadratic coefficient {} and cubic coefficient {}", intercept, linear_coeff, quadratic_coeff, cubic_coeff);
 				let mut points: Vec<DataPoint> = Vec::new();
-				for scaled_x in x_min..=(x_max * scale_factor) {
+				for scaled_x in (x_min * scale_factor)..=(x_max * scale_factor) {
 					let x = scaled_x as f32 / scale_factor as f32;
 					let y = intercept
 						+ (linear_coeff * x) + (quadratic_coeff * x.powf(2.0))
@@ -228,7 +228,7 @@ impl BestFit {
 			} => {
 				trace!("Finding coordinates for GenericPolynomial best fit line");
 				let mut points: Vec<DataPoint> = Vec::new();
-				for scaled_x in x_min..=(x_max * scale_factor) {
+				for scaled_x in (x_min * scale_factor)..=(x_max * scale_factor) {
 					let x = scaled_x as f32 / scale_factor as f32;
 					let mut y = 0.0;
 					for (k, v) in coefficients.iter() {
@@ -262,7 +262,7 @@ impl BestFit {
 					std::process::exit(1);
 				}
 				let mut points: Vec<DataPoint> = Vec::new();
-				for scaled_x in x_min..=(x_max * scale_factor) {
+				for scaled_x in (x_min * scale_factor)..=(x_max * scale_factor) {
 					let x = scaled_x as f32 / scale_factor as f32;
 					let y = (constant * base.powf(power * x)) + vertical_shift;
 					if y > y_min as f32 && y < y_max as f32 {
@@ -292,7 +292,7 @@ impl BestFit {
 					std::process::exit(1)
 				}
 				let mut points: Vec<DataPoint> = Vec::new();
-				for scaled_x in x_min..=(x_max * scale_factor) {
+				for scaled_x in (x_min * scale_factor)..=(x_max * scale_factor) {
 					let x = scaled_x as f32 / scale_factor as f32;
 					let y = (variance * (2.0 * PI).sqrt()).powf(-1.0)
 						* E.powf(-(x - expected_value).powf(2.0) / (2.0 * variance.powf(2.0)));
@@ -345,7 +345,7 @@ impl BestFit {
 			} => {
 				trace!("Finding coordinates for Sinusoidal best fit line with amplitude {}, period {}, phase shift {} and vertical shift {}", amplitude, period, phase_shift, vertical_shift);
 				let mut points: Vec<DataPoint> = Vec::new();
-				for scaled_x in x_min..=(x_max * scale_factor) {
+				for scaled_x in (x_min * scale_factor)..=(x_max * scale_factor) {
 					let x = scaled_x as f32 / scale_factor as f32;
 					let y = amplitude * ((period * x) + phase_shift).sin() + vertical_shift;
 					if y > y_min as f32 && y < y_max as f32 {
@@ -372,7 +372,7 @@ impl BestFit {
 			} => {
 				trace!("Finding coordinates for Cosinusoidal best fit line with amplitude {}, period {}, phase shift {} and vertical shift {}", amplitude, period, phase_shift, vertical_shift);
 				let mut points: Vec<DataPoint> = Vec::new();
-				for scaled_x in x_min..=(x_max * scale_factor) {
+				for scaled_x in (x_min * scale_factor)..=(x_max * scale_factor) {
 					let x = scaled_x as f32 / scale_factor as f32;
 					let y = amplitude * ((period * x) + phase_shift).cos() + vertical_shift;
 					if y > y_min as f32 && y < y_max as f32 {

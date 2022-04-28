@@ -344,24 +344,6 @@ pub fn draw_y_axis_scale_markings(
 					let py = axis_min_pixel.1 - (i * subdivision_length);
 					canvas.put_pixel(px, py, Rgba(BLACK));
 				}
-				// Draw the data label text
-				// For TopPair don't draw the origin marker text otherwise it sits on x-axis
-				if i == 0 && *quadrants == Quadrants::TopPair {continue}
-				let text = (y_data_min_max_limits.0 as f32 + (value_per_subdivision * i as f32))
-					.to_string();
-				let glyphs = create_glyphs(font_size, &text, &font);
-				// So that scale markers are not drawn on the graph area itself check which quadrant type
-				// and flip if necessary so they are drawn in the available whitespace outside the axis
-				let origin_x = if *quadrants == Quadrants::TopLeft {
-					axis_origin_pixel.0 + (data_label_length * label_length_scale)
-				} else {
-					axis_origin_pixel.0 - (data_label_length * label_length_scale)
-				};
-				let origin_y = axis_min_pixel.1 - (i * subdivision_length);
-				let offset = get_y_axis_scale_label_offset(&glyphs, origin_x, origin_y, quadrants);
-				trace!("Drawing y-axis label {} at {:?}", text, offset);
-				draw_glyphs(canvas, BLACK, glyphs, offset);
-
 				// If there's enough space between each scale marker create mini-markings
 				// mini-marker varients
 				let marker_count = vec![9, 4, 3, 2, 1];
@@ -386,6 +368,23 @@ pub fn draw_y_axis_scale_markings(
 						break 'outer;
 					}
 				}
+				// Draw the data label text
+				// For TopPair don't draw the origin marker text otherwise it sits on x-axis
+				if i == 0 && *quadrants == Quadrants::TopPair {continue}
+				let text = (y_data_min_max_limits.0 as f32 + (value_per_subdivision * i as f32))
+					.to_string();
+				let glyphs = create_glyphs(font_size, &text, &font);
+				// So that scale markers are not drawn on the graph area itself check which quadrant type
+				// and flip if necessary so they are drawn in the available whitespace outside the axis
+				let origin_x = if *quadrants == Quadrants::TopLeft {
+					axis_origin_pixel.0 + (data_label_length * label_length_scale)
+				} else {
+					axis_origin_pixel.0 - (data_label_length * label_length_scale)
+				};
+				let origin_y = axis_min_pixel.1 - (i * subdivision_length);
+				let offset = get_y_axis_scale_label_offset(&glyphs, origin_x, origin_y, quadrants);
+				trace!("Drawing y-axis label {} at {:?}", text, offset);
+				draw_glyphs(canvas, BLACK, glyphs, offset);
 			}
 		}
 		// varients with just a negative y-axis

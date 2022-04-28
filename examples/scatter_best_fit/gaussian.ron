@@ -21,7 +21,7 @@ Scatter(
 			symbol: Point, // the shape a plotted data point should take
 			symbol_radius: 5, // The size of a drawn symbol in (1+ symbol_radius) pixels
 			symbol_thickness: 0, // The thinkness of a drawn symbol in (1 + symbol_thickness) pixels
-			best_fit: Some(Gaussian(expected_value: 5.0, variance: 0.2, colour: Black)), // A curve to fit to the axes. Some(BestFit) or None
+			best_fit: Some(Gaussian(expected_value: 0.0, variance: 0.3, colour: Black)), // A curve to fit to the axes. Some(BestFit) or None
 		),
 	],
 )
