@@ -269,3 +269,4 @@ Try increasing the size of your canvas if the edges of the text become blurry.
 * Show BestFit types in legend
 * Allow overriding font
 * checked sub and addition to ensure pixel u32s are not overflowing maybe?
+* Split/simplify drawing methods out and then add a billion tests, many around position calculations
