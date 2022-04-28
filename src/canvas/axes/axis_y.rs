@@ -208,21 +208,17 @@ pub fn draw_y_axis_scale_markings(
 						axis_origin_pixel.0 - n
 					};
 					let py = axis_origin_pixel.1 - (i * subdivision_length);
-					canvas.put_pixel(
-						px,
-						py,
-						Rgba(BLACK),
-					);
+					canvas.put_pixel(px, py, Rgba(BLACK));
 				}
 				// Draw the data label text
 				// Don't draw text directly over origin ortherwise it obscures axis
 				if i != 0 {
 					let text = (value_per_subdivision * i as f32).to_string();
 					let glyphs = create_glyphs(font_size, &text, &font);
-					let origin_x =
-						axis_origin_pixel.0 - (data_label_length * label_length_scale);
+					let origin_x = axis_origin_pixel.0 - (data_label_length * label_length_scale);
 					let origin_y = axis_origin_pixel.1 - (i * subdivision_length);
-					let offset = get_y_axis_scale_label_offset(&glyphs, origin_x, origin_y, quadrants);
+					let offset =
+						get_y_axis_scale_label_offset(&glyphs, origin_x, origin_y, quadrants);
 					trace!("Drawing y-axis label {} at {:?}", text, offset);
 					draw_glyphs(canvas, BLACK, glyphs, offset);
 				}
@@ -244,12 +240,9 @@ pub fn draw_y_axis_scale_markings(
 									} else {
 										axis_origin_pixel.0 - n
 									};
-									let py = axis_origin_pixel.1 - ((i * subdivision_length) + (j * marker_spacing));
-									canvas.put_pixel(
-										px,
-										py,
-										Rgba(BLACK),
-									);
+									let py = axis_origin_pixel.1
+										- ((i * subdivision_length) + (j * marker_spacing));
+									canvas.put_pixel(px, py, Rgba(BLACK));
 								}
 							}
 							break 'outer_pos;
@@ -270,21 +263,17 @@ pub fn draw_y_axis_scale_markings(
 						axis_origin_pixel.0 - n
 					};
 					let py = axis_origin_pixel.1 + (i * subdivision_length);
-					canvas.put_pixel(
-						px,
-						py,
-						Rgba(BLACK),
-					);
+					canvas.put_pixel(px, py, Rgba(BLACK));
 				}
 				// Draw the data label text
 				// Don't draw text directly over origin ortherwise it obscures axis
 				if i != 0 {
 					let text = (-value_per_subdivision * i as f32).to_string();
 					let glyphs = create_glyphs(font_size, &text, &font);
-					let origin_x =
-						axis_origin_pixel.0 - (data_label_length * label_length_scale);
+					let origin_x = axis_origin_pixel.0 - (data_label_length * label_length_scale);
 					let origin_y = axis_origin_pixel.1 + (i * subdivision_length);
-					let offset = get_y_axis_scale_label_offset(&glyphs, origin_x, origin_y, quadrants);
+					let offset =
+						get_y_axis_scale_label_offset(&glyphs, origin_x, origin_y, quadrants);
 					trace!("Drawing y-axis label {} at {:?}", text, offset);
 					draw_glyphs(canvas, BLACK, glyphs, offset);
 				}
@@ -307,12 +296,8 @@ pub fn draw_y_axis_scale_markings(
 										axis_origin_pixel.0 - n
 									};
 									let py = axis_origin_pixel.1
-									+ ((i * subdivision_length) + (j * marker_spacing));
-									canvas.put_pixel(
-										px,
-										py,
-										Rgba(BLACK),
-									);
+										+ ((i * subdivision_length) + (j * marker_spacing));
+									canvas.put_pixel(px, py, Rgba(BLACK));
 								}
 							}
 							break 'outer_neg;
@@ -461,7 +446,8 @@ pub fn draw_y_axis_scale_markings(
 						axis_origin_pixel.0 - (data_label_length * label_length_scale)
 					};
 					let origin_y = axis_origin_pixel.1 + (i * subdivision_length);
-					let offset = get_y_axis_scale_label_offset(&glyphs, origin_x, origin_y, quadrants);
+					let offset =
+						get_y_axis_scale_label_offset(&glyphs, origin_x, origin_y, quadrants);
 					trace!("Drawing y-axis label {} at {:?}", text, offset);
 					draw_glyphs(canvas, BLACK, glyphs, offset);
 				}

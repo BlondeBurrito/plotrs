@@ -1,5 +1,5 @@
 //! Constructs a scatter graph based on the `.ron` definition:
-//! 
+//!
 //! ```txt
 //! Scatter(
 //! 	title: "Engery against Time for Fuzzing About Things",

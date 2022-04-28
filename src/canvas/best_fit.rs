@@ -43,7 +43,7 @@ pub enum BestFit {
 	///     y += v * x.powf(k as f32);
 	/// }
 	/// ```
-	/// 
+	///
 	/// For instance a Quartic (4th power) polynomial could be represented in `.ron` as
 	/// `Some(GenericPolynomial(coefficients: {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: -1.0}, colour: Black))`
 	GenericPolynomial {
