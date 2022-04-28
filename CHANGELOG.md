@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file.
 - Recalculate legend position and how it occupies space on the canvas
 - X-axis scale markers now sit outside the axis in whitespace when negative y range is dominant
 - Reposition y axis scale markers to avoid graph overlap and make use of free whitespace
+- Axis scale text no longer overlays where negative and positive axes meet
 
 ### Documentation
 
@@ -44,6 +45,7 @@ All notable changes to this project will be documented in this file.
 - Prototype generating relevant quadrants to build based on x-y ranges in csv data
 - All quadrants drawn in various combinations
 - Added gaussian distribution best fit type
+- Support for negative axes
 
 ### Miscellaneous Tasks
 
