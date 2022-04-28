@@ -1,6 +1,6 @@
 [package]
 name = "plotrs"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 rust-version = "1.60"
 description = "CLI app for plotting data points from a csv and writing a png to disk"
@@ -9,7 +9,7 @@ homepage = "https://github.com/BlondeBurrito/plotrs"
 repository = "https://github.com/BlondeBurrito/plotrs"
 license = "MIT OR Apache-2.0"
 keywords = ["cli", "plot", "plotting", "graph", "data"]
-catagories = ["command-line-utilities", "multimedia::images", "mathematics", "science", "visualization"]
+categories = ["command-line-utilities", "multimedia::images", "mathematics", "science", "visualization"]
 exclude = [
     ".github/**",
     "justfile",
