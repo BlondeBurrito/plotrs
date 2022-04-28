@@ -1,4 +1,4 @@
-//!
+//! Based on a type of BestFit this module will calculate the valid data points for the given axes/canvas size
 
 use std::collections::HashMap;
 
@@ -10,7 +10,7 @@ use crate::{
 	colours::Colour,
 };
 
-/// Types of curve that cna be fitted to a graph
+/// Types of curve that can be fitted to a graph
 #[derive(Debug, Deserialize, Clone)]
 pub enum BestFit {
 	/// Equation of a straight line, `y = mx + c`
@@ -43,6 +43,9 @@ pub enum BestFit {
 	///     y += v * x.powf(k as f32);
 	/// }
 	/// ```
+	/// 
+	/// For instance a Quartic (4th power) polynomial could be represented in `.ron` as
+	/// `Some(GenericPolynomial(coefficients: {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: -1.0}, colour: Black))`
 	GenericPolynomial {
 		coefficients: HashMap<u32, f32>,
 		colour: Colour,
@@ -86,7 +89,7 @@ pub enum BestFit {
 }
 
 impl BestFit {
-	/// Based of type of `BestFit` curve generate its coordinates within the given bounds
+	/// Based on the type of `BestFit` curve generate its coordinates within the given bounds and a scale factor is used to create a seamless curve, i.e a large number of tightly knit points to create the illusion of a line
 	pub fn find_coordinates(
 		&self,
 		x_min: i32,

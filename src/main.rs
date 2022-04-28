@@ -15,7 +15,7 @@ mod colours;
 mod data;
 mod scatter;
 
-/// Program arguments
+/// Programme arguments
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
 struct Args {
@@ -31,10 +31,11 @@ struct Args {
 	/// Override the default csv delimiter "," with your own, e.g ";"
 	#[clap(long, default_value_t = String::from(","))]
 	csv_delimiter: String,
+	/// Set the verbosity level with a series of `v`'s, e.g `-v` or `-vv`
 	#[clap(flatten)]
 	verbose: clap_verbosity_flag::Verbosity<clap_verbosity_flag::InfoLevel>,
 }
-
+/// Process Cli arguments and call appropriate methods for graph creation
 fn main() {
 	let args = Args::parse();
 	// set various logging levels

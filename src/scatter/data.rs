@@ -1,4 +1,4 @@
-//!
+//! Reads data sets to identify data ranges, points for plotting and legend fields
 
 use image::{ImageBuffer, Rgba};
 use tracing::{debug, error};
@@ -152,7 +152,7 @@ pub fn get_data_bounds(data_set: &Vec<DataSet>, csv_delimiter: &str) -> ((f32, f
 	return ((min_x, min_y), (max_x, max_y));
 }
 
-/// Iterate through the data sets extracing the values from the csv and plot them
+/// Iterate through the data sets extracting the values from the csv and plot them
 pub fn build_data_points(
 	data_set: &Vec<DataSet>,
 	csv_delimiter: &str,

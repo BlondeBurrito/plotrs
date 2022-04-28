@@ -1,4 +1,4 @@
-//!
+//! Draws a title onto a canvas
 
 use image::{ImageBuffer, Rgba};
 use rusttype::PositionedGlyph;

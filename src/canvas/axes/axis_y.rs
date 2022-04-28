@@ -1,4 +1,4 @@
-//!
+//! Draws the y-axis with labels and scale markers
 
 use image::{ImageBuffer, Rgba};
 use rusttype::PositionedGlyph;

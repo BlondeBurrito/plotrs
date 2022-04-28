@@ -1,4 +1,4 @@
-//!
+//! Calculation of font sizes, vectors of glyphs, drawing of glyphs and helper methods to find glyph height and width to assist in positioning text on a canvas
 
 use image::{ImageBuffer, Rgba};
 use rusttype::{point, Font, PositionedGlyph, Scale};
@@ -55,7 +55,9 @@ pub fn create_glyphs<'a>(
 	font.layout(text, scale, point(0.0, 0.0 + v_metrics.ascent))
 		.collect()
 }
-/// Draws glyphs onto the canvas at a given position
+/// Draws glyphs onto the canvas at a given position.
+/// Note that the position is taken to be the top left corner of the starting glyph, so their height
+/// extends downwards and width extends to the right
 pub fn draw_glyphs(
 	canvas: &mut ImageBuffer<Rgba<u8>, Vec<u8>>,
 	colour: [u8; 4],

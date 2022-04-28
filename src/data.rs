@@ -1,4 +1,4 @@
-//!
+//! For reading a `.csv` file
 
 use csv::StringRecord;
 use tracing::{error, trace};

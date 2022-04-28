@@ -1,4 +1,4 @@
-//!
+//! Controls drawing a legend onto a canvas
 
 use image::{ImageBuffer, Rgba};
 use tracing::{debug, trace, warn};
@@ -13,15 +13,21 @@ use crate::{
 };
 
 use super::plot::DataSymbol;
+/// Representation of a legend entry (row)
 #[derive(Debug)]
 pub struct LegendField {
+	/// The symbol that represents the data set
 	pub symbol: DataSymbol,
+	/// The size of the symbol
 	pub symbol_radius: u32,
+	/// The thickness of the smbol
 	pub symbol_thickness: u32,
+	/// The colour of the symbol
 	pub colour: Colour,
+	/// The name of the data set
 	pub name: String,
 }
-
+/// From a given `origin` point create a series of rows containing the symbol and name of each data set
 pub fn build_legend(
 	canvas: &mut ImageBuffer<Rgba<u8>, Vec<u8>>,
 	origin: (u32, u32),

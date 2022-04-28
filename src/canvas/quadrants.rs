@@ -1,14 +1,15 @@
-//!
+//! Calculates which cartesian quadrants need to be drawn based on the x-y range of supplied data sets
 
+/// Quadrant combinations
 #[derive(PartialEq, Debug)]
 pub enum Quadrants {
 	/// Top right and bottom right quadrants, x is only positive, y is pos and neg
 	RightPair,
 	/// Top left and bottom left quadrants, x is only negative, y is pos and neg
 	LeftPair,
-	/// Top left and top right quadrants, x is pos and neg, y is onl positive
+	/// Top left and top right quadrants, x is pos and neg, y is only positive
 	TopPair,
-	/// Bottom left and bottom right quadrants, x is neg and pos, y is onl negative
+	/// Bottom left and bottom right quadrants, x is neg and pos, y is only negative
 	BottomPair,
 	/// Top left, top right, bottom left, bottom right quadrants, x is pos and neg, y is pos and neg
 	AllQuadrants,

@@ -1,4 +1,4 @@
-//!
+//! Methods for creating and labeling axes and determining dimensions
 
 use image::{ImageBuffer, Rgba};
 

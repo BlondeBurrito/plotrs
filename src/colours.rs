@@ -25,7 +25,7 @@ pub enum Colour {
 }
 
 impl Colour {
-	/// Get the colour that should be used when drawing data points
+	/// Get the `u8` representation of a colour that should be used when drawing data points
 	pub fn get_pixel_colour(colour: Colour) -> [u8; 4] {
 		match colour {
 			Colour::White => WHITE,
