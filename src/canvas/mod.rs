@@ -55,7 +55,7 @@ pub fn draw_base_canvas(canvas_pixel_size: (u32, u32)) -> ImageBuffer<Rgba<u8>, 
 	for pixel in imgbuf.pixels_mut() {
 		*pixel = image::Rgba(WHITE);
 	}
-	return imgbuf;
+	imgbuf
 }
 
 /// Save finished image to disk where the file name is taken from the title of the graph

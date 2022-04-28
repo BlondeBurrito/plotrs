@@ -73,6 +73,15 @@ Scatter(
 )
 ```
 
+Where your `csv` data may look like (note the lack of whitespace between columns!):
+
+```csv
+x,y
+0.5,0.5
+1.0,1.0
+1.5,1.5
+```
+
 ## Symbol Types
 
 The following symbols can be used for plotted data points:
@@ -84,6 +93,8 @@ The following symbols can be used for plotted data points:
 * Point
 
 ## Best Fit Schemas
+
+Each data set definition can also specify a Best Fit line to be drawn. In the examples below the data sets are tiny and the symbols are coloured white to hide them in the background canvas, they really just define the extent of the axes to show case overlaying a Best Fit.
 
 ### Linear
 

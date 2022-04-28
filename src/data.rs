@@ -29,5 +29,5 @@ pub fn load_data(data_path: &str, has_headers: bool, csv_delimiter: &str) -> Vec
 			}
 		}
 	}
-	return string_records;
+	string_records
 }

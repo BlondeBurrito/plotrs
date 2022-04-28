@@ -8,9 +8,13 @@ use crate::colours::*;
 
 /// Font sizes for the different elements of a graph
 pub struct FontSizes {
+	/// Size of the title font
 	pub title_font_size: f32,
+	/// Size of the axis font
 	pub axis_font_size: f32,
+	/// Size of the axis scale markings font
 	pub axis_unit_font_size: f32,
+	/// Size of the legend font
 	pub legend_font_size: f32,
 }
 
@@ -34,10 +38,10 @@ impl FontSizes {
 		//TODO: is there a better way to calc legend font size?
 		let legend_font_size = axis_font_size;
 		FontSizes {
-			title_font_size: title_font_size,
-			axis_font_size: axis_font_size,
-			axis_unit_font_size: axis_unit_font_size,
-			legend_font_size: legend_font_size,
+			title_font_size,
+			axis_font_size,
+			axis_unit_font_size,
+			legend_font_size,
 		}
 	}
 }
@@ -91,7 +95,7 @@ pub fn draw_glyphs(
 	}
 }
 /// From a vector of glyphs find the maximum glyph height
-pub fn get_maximum_height_of_glyphs(glyphs: &Vec<PositionedGlyph>) -> u32 {
+pub fn get_maximum_height_of_glyphs(glyphs: &[PositionedGlyph]) -> u32 {
 	let min_y = glyphs
 		.first()
 		.map(|g| g.pixel_bounding_box().unwrap().min.y)
@@ -103,7 +107,7 @@ pub fn get_maximum_height_of_glyphs(glyphs: &Vec<PositionedGlyph>) -> u32 {
 	(max_y - min_y) as u32
 }
 /// From a vector of glyphs find the total width
-pub fn get_width_of_glyphs(glyphs: &Vec<PositionedGlyph>) -> u32 {
+pub fn get_width_of_glyphs(glyphs: &[PositionedGlyph]) -> u32 {
 	let min_x = glyphs
 		.first()
 		.map(|g| g.pixel_bounding_box().unwrap().min.x)

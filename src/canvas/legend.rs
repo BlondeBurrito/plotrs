@@ -36,7 +36,6 @@ pub fn build_legend(
 ) -> VHConsumedCanvasSpace {
 	debug!("Building legend at {:?}...", origin);
 	let font = get_system_font();
-	let items = fields.len();
 	// As symbols have different radii we want to find the maximum so we can space out the legend elements
 	// with the same offset
 	let max_radius: u32 = fields
@@ -45,8 +44,7 @@ pub fn build_legend(
 		.unwrap()
 		.symbol_radius
 		+ 2;
-	for i in 0..items {
-		let field = &fields[i];
+	for (i, field) in fields.iter().enumerate() {
 		trace!("Legend field {:?}", field);
 		let glyphs = create_glyphs(font_size, &field.name, &font);
 		// height is used to write legend fields on new rows

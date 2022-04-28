@@ -19,11 +19,11 @@ use super::glyphs::{create_glyphs, draw_glyphs};
 /// from the top of the canvas with an additional buffer of `CANVAS_BORDER_PIXELS`
 pub fn build_title(
 	canvas: &mut ImageBuffer<Rgba<u8>, Vec<u8>>,
-	title: &String,
+	title: &str,
 	font_size: f32,
 ) -> VHConsumedCanvasSpace {
 	let font = get_system_font();
-	let glyphs: Vec<PositionedGlyph> = create_glyphs(font_size, title.as_str(), &font);
+	let glyphs: Vec<PositionedGlyph> = create_glyphs(font_size, title, &font);
 	let height = get_maximum_height_of_glyphs(&glyphs);
 	let width = get_width_of_glyphs(&glyphs);
 	// position the title in the middle

@@ -8,6 +8,7 @@ use crate::colours::Colour;
 
 /// The shape a plotted data point should take
 #[derive(Debug, Deserialize, Copy, Clone)]
+#[allow(clippy::missing_docs_in_private_items)]
 pub enum DataSymbol {
 	Cross,
 	Circle,
@@ -195,7 +196,7 @@ impl DataSymbol {
 				pixel_coords.push(origin);
 			}
 		}
-		return pixel_coords;
+		pixel_coords
 	}
 }
 

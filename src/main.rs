@@ -30,12 +30,10 @@ use clap::Parser;
 use font_kit::{
 	family_name::FamilyName, handle::Handle, properties::Properties, source::SystemSource,
 };
-use log;
 use rusttype::Font;
 use std::fs;
 use tracing::error;
 use tracing::{self, trace};
-use tracing_subscriber;
 mod canvas;
 mod colours;
 mod data;

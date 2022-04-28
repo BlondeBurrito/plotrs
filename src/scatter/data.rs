@@ -10,9 +10,9 @@ use crate::{
 
 use super::DataSet;
 
-// Reads the supplied csv files and finds the minimum and maximum x and y values across all sets.
-// This faciliates drawing values on axes and finding the ratio of pixels to a data point for plotting
-pub fn get_data_bounds(data_set: &Vec<DataSet>, csv_delimiter: &str) -> ((f32, f32), (f32, f32)) {
+/// Reads the supplied csv files and finds the minimum and maximum x and y values across all sets.
+/// This faciliates drawing values on axes and finding the ratio of pixels to a data point for plotting
+pub fn get_data_bounds(data_set: &[DataSet], csv_delimiter: &str) -> ((f32, f32), (f32, f32)) {
 	let mut min_x = f32::MAX;
 	let mut min_ux = Some(f32::MAX); // TODO: unused at present
 	let mut min_y = f32::MAX;
@@ -149,12 +149,12 @@ pub fn get_data_bounds(data_set: &Vec<DataSet>, csv_delimiter: &str) -> ((f32, f
 			row += 1;
 		}
 	}
-	return ((min_x, min_y), (max_x, max_y));
+	((min_x, min_y), (max_x, max_y))
 }
 
 /// Iterate through the data sets extracting the values from the csv and plot them
 pub fn build_data_points(
-	data_set: &Vec<DataSet>,
+	data_set: &[DataSet],
 	csv_delimiter: &str,
 	canvas: &mut ImageBuffer<Rgba<u8>, Vec<u8>>,
 	x_scale_factor: f32,
@@ -269,7 +269,7 @@ pub fn build_data_points(
 	}
 }
 /// Extracts the colour, symbol and data set names for use in building a legend
-pub fn get_legend_fields(data_set: &Vec<DataSet>) -> Vec<LegendField> {
+pub fn get_legend_fields(data_set: &[DataSet]) -> Vec<LegendField> {
 	let mut legend_fields: Vec<LegendField> = Vec::new();
 	for set in data_set.iter() {
 		legend_fields.push(LegendField {
@@ -280,5 +280,5 @@ pub fn get_legend_fields(data_set: &Vec<DataSet>) -> Vec<LegendField> {
 			name: set.name.to_owned(),
 		});
 	}
-	return legend_fields;
+	legend_fields
 }

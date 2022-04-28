@@ -2,6 +2,7 @@
 
 /// Quadrant combinations
 #[derive(PartialEq, Debug)]
+#[allow(clippy::enum_variant_names)]
 pub enum Quadrants {
 	/// Top right and bottom right quadrants, x is only positive, y is pos and neg
 	RightPair,

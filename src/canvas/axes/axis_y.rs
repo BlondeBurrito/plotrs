@@ -15,6 +15,7 @@ use crate::{
 };
 
 /// Draws the y-axis label onto the canvas, returns how much new vertical-horizontal space has been consumed on the canvas
+#[allow(clippy::too_many_arguments)]
 pub fn build_y_axis_label(
 	canvas: &mut ImageBuffer<Rgba<u8>, Vec<u8>>,
 	label: String,
@@ -141,6 +142,7 @@ pub fn draw_y_axis(
 }
 
 /// Draws the scale markings along the x-axis
+#[allow(clippy::too_many_arguments)]
 pub fn draw_y_axis_scale_markings(
 	quadrants: &Quadrants,
 	canvas: &mut ImageBuffer<Rgba<u8>, Vec<u8>>,
@@ -228,25 +230,23 @@ pub fn draw_y_axis_scale_markings(
 				let marker_count = vec![9, 4, 3, 2, 1];
 				'outer_pos: for mc in marker_count.iter() {
 					// (mc + 1) because there needs to be a gap between final mini-marker and scale marker
-					if subdivision_length % (mc + 1) == 0 {
-						if i < y_axis_resolution {
-							for j in 1..=*mc {
-								let marker_spacing = subdivision_length / (mc + 1);
-								for n in 0..data_label_length {
-									// So that scale markers are not drawn on the graph area itself check which quadrant type
-									// and flip if necessary so they are drawn in the available whitespace outside the axis
-									let px = if *quadrants == Quadrants::LeftPair {
-										axis_origin_pixel.0 + n
-									} else {
-										axis_origin_pixel.0 - n
-									};
-									let py = axis_origin_pixel.1
-										- ((i * subdivision_length) + (j * marker_spacing));
-									canvas.put_pixel(px, py, Rgba(BLACK));
-								}
+					if subdivision_length % (mc + 1) == 0 && i < y_axis_resolution {
+						for j in 1..=*mc {
+							let marker_spacing = subdivision_length / (mc + 1);
+							for n in 0..data_label_length {
+								// So that scale markers are not drawn on the graph area itself check which quadrant type
+								// and flip if necessary so they are drawn in the available whitespace outside the axis
+								let px = if *quadrants == Quadrants::LeftPair {
+									axis_origin_pixel.0 + n
+								} else {
+									axis_origin_pixel.0 - n
+								};
+								let py = axis_origin_pixel.1
+									- ((i * subdivision_length) + (j * marker_spacing));
+								canvas.put_pixel(px, py, Rgba(BLACK));
 							}
-							break 'outer_pos;
 						}
+						break 'outer_pos;
 					}
 				}
 			}
@@ -283,25 +283,23 @@ pub fn draw_y_axis_scale_markings(
 				let marker_count = vec![9, 4, 3, 2, 1];
 				'outer_neg: for mc in marker_count.iter() {
 					// (mc + 1) because there needs to be a gap between final mini-marker and scale marker
-					if subdivision_length % (mc + 1) == 0 {
-						if i < y_axis_resolution {
-							for j in 1..=*mc {
-								let marker_spacing = subdivision_length / (mc + 1);
-								for n in 0..data_label_length {
-									// So that scale markers are not drawn on the graph area itself check which quadrant type
-									// and flip if necessary so they are drawn in the available whitespace outside the axis
-									let px = if *quadrants == Quadrants::LeftPair {
-										axis_origin_pixel.0 + n
-									} else {
-										axis_origin_pixel.0 - n
-									};
-									let py = axis_origin_pixel.1
-										+ ((i * subdivision_length) + (j * marker_spacing));
-									canvas.put_pixel(px, py, Rgba(BLACK));
-								}
+					if subdivision_length % (mc + 1) == 0 && i < y_axis_resolution {
+						for j in 1..=*mc {
+							let marker_spacing = subdivision_length / (mc + 1);
+							for n in 0..data_label_length {
+								// So that scale markers are not drawn on the graph area itself check which quadrant type
+								// and flip if necessary so they are drawn in the available whitespace outside the axis
+								let px = if *quadrants == Quadrants::LeftPair {
+									axis_origin_pixel.0 + n
+								} else {
+									axis_origin_pixel.0 - n
+								};
+								let py = axis_origin_pixel.1
+									+ ((i * subdivision_length) + (j * marker_spacing));
+								canvas.put_pixel(px, py, Rgba(BLACK));
 							}
-							break 'outer_neg;
 						}
+						break 'outer_neg;
 					}
 				}
 			}
@@ -367,25 +365,23 @@ pub fn draw_y_axis_scale_markings(
 				let marker_count = vec![9, 4, 3, 2, 1];
 				'outer: for mc in marker_count.iter() {
 					// (mc + 1) because there needs to be a gap between final mini-marker and scale marker
-					if subdivision_length % (mc + 1) == 0 {
-						if i < y_axis_resolution {
-							for j in 1..=*mc {
-								let marker_spacing = subdivision_length / (mc + 1);
-								for n in 0..data_label_length {
-									// So that scale markers are not drawn on the graph area itself check which quadrant type
-									// and flip if necessary so they are drawn in the available whitespace outside the axis
-									let px = if *quadrants == Quadrants::TopLeft {
-										axis_origin_pixel.0 + n
-									} else {
-										axis_origin_pixel.0 - n
-									};
-									let py = axis_min_pixel.1
-										- ((i * subdivision_length) + (j * marker_spacing));
-									canvas.put_pixel(px, py, Rgba(BLACK));
-								}
+					if subdivision_length % (mc + 1) == 0 && i < y_axis_resolution {
+						for j in 1..=*mc {
+							let marker_spacing = subdivision_length / (mc + 1);
+							for n in 0..data_label_length {
+								// So that scale markers are not drawn on the graph area itself check which quadrant type
+								// and flip if necessary so they are drawn in the available whitespace outside the axis
+								let px = if *quadrants == Quadrants::TopLeft {
+									axis_origin_pixel.0 + n
+								} else {
+									axis_origin_pixel.0 - n
+								};
+								let py = axis_min_pixel.1
+									- ((i * subdivision_length) + (j * marker_spacing));
+								canvas.put_pixel(px, py, Rgba(BLACK));
 							}
-							break 'outer;
 						}
+						break 'outer;
 					}
 				}
 			}
@@ -457,25 +453,23 @@ pub fn draw_y_axis_scale_markings(
 				let marker_count = vec![9, 4, 3, 2, 1];
 				'outer_b_neg: for mc in marker_count.iter() {
 					// (mc + 1) because there needs to be a gap between final mini-marker and scale marker
-					if subdivision_length % (mc + 1) == 0 {
-						if i < y_axis_resolution {
-							for j in 1..=*mc {
-								let marker_spacing = subdivision_length / (mc + 1);
-								for n in 0..data_label_length {
-									// So that scale markers are not drawn on the graph area itself check which quadrant type
-									// and flip if necessary so they are drawn in the available whitespace outside the axis
-									let px = if *quadrants == Quadrants::BottomLeft {
-										axis_origin_pixel.0 + n
-									} else {
-										axis_origin_pixel.0 - n
-									};
-									let py = axis_origin_pixel.1
-										+ ((i * subdivision_length) + (j * marker_spacing));
-									canvas.put_pixel(px, py, Rgba(BLACK));
-								}
+					if subdivision_length % (mc + 1) == 0 && i < y_axis_resolution {
+						for j in 1..=*mc {
+							let marker_spacing = subdivision_length / (mc + 1);
+							for n in 0..data_label_length {
+								// So that scale markers are not drawn on the graph area itself check which quadrant type
+								// and flip if necessary so they are drawn in the available whitespace outside the axis
+								let px = if *quadrants == Quadrants::BottomLeft {
+									axis_origin_pixel.0 + n
+								} else {
+									axis_origin_pixel.0 - n
+								};
+								let py = axis_origin_pixel.1
+									+ ((i * subdivision_length) + (j * marker_spacing));
+								canvas.put_pixel(px, py, Rgba(BLACK));
 							}
-							break 'outer_b_neg;
 						}
+						break 'outer_b_neg;
 					}
 				}
 			}
@@ -485,7 +479,7 @@ pub fn draw_y_axis_scale_markings(
 
 /// Using glyph sizes calculate by how much the axis data label should be offset from an origin point
 fn get_y_axis_scale_label_offset(
-	glyphs: &Vec<PositionedGlyph>,
+	glyphs: &[PositionedGlyph],
 	origin_x: u32,
 	origin_y: u32,
 	quadrants: &Quadrants,
@@ -506,5 +500,5 @@ fn get_y_axis_scale_label_offset(
 	);
 	let vertical_postion = origin_y - (height / 2);
 	trace!("Y-axis data label vertical offset: {}", vertical_postion);
-	return (horizontal_position, vertical_postion);
+	(horizontal_position, vertical_postion)
 }
