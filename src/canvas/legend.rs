@@ -74,7 +74,7 @@ pub fn build_legend(
 	}
 	VHConsumedCanvasSpace {
 		v_space_from_top: 0,
-		h_space_from_right: canvas.dimensions().0 - origin.0,
+		h_space_from_right: (canvas.dimensions().0 - (origin.0))/2,
 		v_space_from_bottom: 0,
 		h_space_from_left: 0,
 	}

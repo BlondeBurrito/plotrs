@@ -28,7 +28,6 @@ pub fn get_xy_axis_pixel_min_max(
 ) -> ((u32, u32), (u32, u32)) {
 	match quadrants {
 		Quadrants::RightPair => {
-			// ensures the whitespace to the left and right are the same when a legend is not specified
 			let minimum_possible_x = horizontal_pixels_from_left;
 			let maximum_possible_x = canvas_size.0 - horizontal_pixels_from_right;
 			// The true length of the axis must be a factor of the resolution so that axis scale markings
@@ -40,8 +39,7 @@ pub fn get_xy_axis_pixel_min_max(
 					break 'outer_x_rp;
 				}
 			}
-			// // ensures at least 5% of the top canvas is free
-			let minimum_possible_y = vertical_pixels_from_top; // + (canvas_size.1 / 20);
+			let minimum_possible_y = vertical_pixels_from_top;
 			let maximum_possible_y = canvas_size.1 - vertical_pixels_from_bottom;
 			// The true length of the axis must be a factor of the resolution so that axis scale markings
 			// accurately line up with plotted points
@@ -59,20 +57,18 @@ pub fn get_xy_axis_pixel_min_max(
 			((minimum_possible_x, y0), (x, y1))
 		}
 		Quadrants::LeftPair => {
-			// ensures the whitespace to the left and right are the same when a legend is not specified
 			let minimum_possible_x = horizontal_pixels_from_left;
 			let maximum_possible_x = canvas_size.0 - horizontal_pixels_from_right;
 			// The true length of the axis must be a factor of the resolution so that axis scale markings
 			// accurately line up with plotted points
-			let mut x = minimum_possible_x;
+			let mut x = maximum_possible_x;
 			'outer_x_lp: for i in 0..maximum_possible_x {
-				if get_x_axis_pixel_length(x + i, minimum_possible_x) % x_axis_resolution == 0 {
-					x += i;
+				if get_x_axis_pixel_length(minimum_possible_x, x - i) % x_axis_resolution == 0 {
+					x -= i;
 					break 'outer_x_lp;
 				}
 			}
-			// // ensures at least 5% of the top canvas is free
-			let minimum_possible_y = vertical_pixels_from_top; // + (canvas_size.1 / 20);
+			let minimum_possible_y = vertical_pixels_from_top;
 			let maximum_possible_y = canvas_size.1 - vertical_pixels_from_bottom;
 			// The true length of the axis must be a factor of the resolution so that axis scale markings
 			// accurately line up with plotted points
@@ -81,16 +77,15 @@ pub fn get_xy_axis_pixel_min_max(
 			'outer_y_lp: for i in 0..minimum_possible_y {
 				// axis extends into negative space so ensure resolution fitting matches half overall length
 				if get_y_axis_pixel_length(y1 + i, maximum_possible_y) / 2 % y_axis_resolution == 0
-					&& get_y_axis_pixel_length(y1 + i, maximum_possible_y) / 2 % 2 == 0
+					// && get_y_axis_pixel_length(y1 + i, maximum_possible_y) / 2 % 2 == 0
 				{
 					y1 += i;
 					break 'outer_y_lp;
 				}
 			}
-			((x, y0), (maximum_possible_x, y1))
+			((minimum_possible_x, y0), (x, y1))
 		}
 		Quadrants::TopPair => {
-			// ensures the whitespace to the left and right are the same when a legend is not specified
 			let minimum_possible_x = horizontal_pixels_from_left;
 			let maximum_possible_x = canvas_size.0 - horizontal_pixels_from_right;
 			// The true length of the axis must be a factor of the resolution so that axis scale markings
@@ -105,8 +100,7 @@ pub fn get_xy_axis_pixel_min_max(
 					break 'outer_x_tp;
 				}
 			}
-			// // ensures at least 5% of the top canvas is free
-			let minimum_possible_y = vertical_pixels_from_top; // + (canvas_size.1 / 20);
+			let minimum_possible_y = vertical_pixels_from_top;
 			let maximum_possible_y = canvas_size.1 - vertical_pixels_from_bottom;
 			// The true length of the axis must be a factor of the resolution so that axis scale markings
 			// accurately line up with plotted points
@@ -120,7 +114,6 @@ pub fn get_xy_axis_pixel_min_max(
 			((x0, maximum_possible_y), (x1, y))
 		}
 		Quadrants::BottomPair => {
-			// ensures the whitespace to the left and right are the same when a legend is not specified
 			let minimum_possible_x = horizontal_pixels_from_left;
 			let maximum_possible_x = canvas_size.0 - horizontal_pixels_from_right;
 			// The true length of the axis must be a factor of the resolution so that axis scale markings
@@ -135,8 +128,7 @@ pub fn get_xy_axis_pixel_min_max(
 					break 'outer_x_bp;
 				}
 			}
-			// // ensures at least 5% of the top canvas is free
-			let minimum_possible_y = vertical_pixels_from_top; // + (canvas_size.1 / 20);
+			let minimum_possible_y = vertical_pixels_from_top;
 			let maximum_possible_y = canvas_size.1 - vertical_pixels_from_bottom;
 			// The true length of the axis must be a factor of the resolution so that axis scale markings
 			// accurately line up with plotted points
@@ -151,7 +143,6 @@ pub fn get_xy_axis_pixel_min_max(
 			((x0, maximum_possible_y), (x1, y))
 		}
 		Quadrants::AllQuadrants => {
-			// ensures the whitespace to the left and right are the same when a legend is not specified
 			let minimum_possible_x = horizontal_pixels_from_left;
 			let maximum_possible_x = canvas_size.0 - horizontal_pixels_from_right;
 			// The true length of the axis must be a factor of the resolution so that axis scale markings
@@ -166,8 +157,7 @@ pub fn get_xy_axis_pixel_min_max(
 					break 'outer_x0;
 				}
 			}
-			// // ensures at least 5% of the top canvas is free
-			let minimum_possible_y = vertical_pixels_from_top; // + (canvas_size.1 / 20);
+			let minimum_possible_y = vertical_pixels_from_top;
 			let maximum_possible_y = canvas_size.1 - vertical_pixels_from_bottom;
 			// The true length of the axis must be a factor of the resolution so that axis scale markings
 			// accurately line up with plotted points
@@ -185,7 +175,6 @@ pub fn get_xy_axis_pixel_min_max(
 			((x0, y0), (x1, y1))
 		}
 		Quadrants::TopRight => {
-			// ensures the whitespace to the left and right are the same when a legend is not specified
 			let minimum_possible_x = horizontal_pixels_from_left;
 			let maximum_possible_x = canvas_size.0 - horizontal_pixels_from_right;
 			// The true length of the axis must be a factor of the resolution so that axis scale markings
@@ -197,8 +186,7 @@ pub fn get_xy_axis_pixel_min_max(
 					break 'outer_x;
 				}
 			}
-			// // ensures at least 5% of the top canvas is free
-			let minimum_possible_y = vertical_pixels_from_top; // + (canvas_size.1 / 20);
+			let minimum_possible_y = vertical_pixels_from_top;
 			let maximum_possible_y = canvas_size.1 - vertical_pixels_from_bottom;
 			// The true length of the axis must be a factor of the resolution so that axis scale markings
 			// accurately line up with plotted points
@@ -212,20 +200,18 @@ pub fn get_xy_axis_pixel_min_max(
 			((minimum_possible_x, maximum_possible_y), (x, y))
 		}
 		Quadrants::TopLeft => {
-			// ensures the whitespace to the left and right are the same when a legend is not specified
 			let minimum_possible_x = horizontal_pixels_from_left;
 			let maximum_possible_x = canvas_size.0 - horizontal_pixels_from_right;
 			// The true length of the axis must be a factor of the resolution so that axis scale markings
 			// accurately line up with plotted points
 			let mut x = minimum_possible_x;
 			'outer_x_tl: for i in 0..maximum_possible_x {
-				if get_x_axis_pixel_length(x + i, minimum_possible_x) % x_axis_resolution == 0 {
+				if get_x_axis_pixel_length(x + i, maximum_possible_x) % x_axis_resolution == 0 {
 					x += i;
 					break 'outer_x_tl;
 				}
 			}
-			// // ensures at least 5% of the top canvas is free
-			let minimum_possible_y = vertical_pixels_from_top; // + (canvas_size.1 / 20);
+			let minimum_possible_y = vertical_pixels_from_top;
 			let maximum_possible_y = canvas_size.1 - vertical_pixels_from_bottom;
 			// The true length of the axis must be a factor of the resolution so that axis scale markings
 			// accurately line up with plotted points
@@ -239,7 +225,6 @@ pub fn get_xy_axis_pixel_min_max(
 			((x, maximum_possible_y), (maximum_possible_x, y))
 		}
 		Quadrants::BottomRight => {
-			// ensures the whitespace to the left and right are the same when a legend is not specified
 			let minimum_possible_x = horizontal_pixels_from_left;
 			let maximum_possible_x = canvas_size.0 - horizontal_pixels_from_right;
 			// The true length of the axis must be a factor of the resolution so that axis scale markings
@@ -251,8 +236,7 @@ pub fn get_xy_axis_pixel_min_max(
 					break 'outer_x_br;
 				}
 			}
-			// // ensures at least 5% of the top canvas is free
-			let minimum_possible_y = vertical_pixels_from_top; // + (canvas_size.1 / 20);
+			let minimum_possible_y = vertical_pixels_from_top;
 			let maximum_possible_y = canvas_size.1 - vertical_pixels_from_bottom;
 			// The true length of the axis must be a factor of the resolution so that axis scale markings
 			// accurately line up with plotted points
@@ -266,20 +250,18 @@ pub fn get_xy_axis_pixel_min_max(
 			((minimum_possible_x, maximum_possible_y), (x, y))
 		}
 		Quadrants::BottomLeft => {
-			// ensures the whitespace to the left and right are the same when a legend is not specified
 			let minimum_possible_x = horizontal_pixels_from_left;
 			let maximum_possible_x = canvas_size.0 - horizontal_pixels_from_right;
 			// The true length of the axis must be a factor of the resolution so that axis scale markings
 			// accurately line up with plotted points
-			let mut x = minimum_possible_x;
+			let mut x = maximum_possible_x;
 			'outer_x_bl: for i in 0..maximum_possible_x {
-				if get_x_axis_pixel_length(x + i, minimum_possible_x) % x_axis_resolution == 0 {
-					x += i;
+				if get_x_axis_pixel_length(minimum_possible_x, x - i) % x_axis_resolution == 0 {
+					x -= i;
 					break 'outer_x_bl;
 				}
 			}
-			// // ensures at least 5% of the top canvas is free
-			let minimum_possible_y = vertical_pixels_from_top; // + (canvas_size.1 / 20);
+			let minimum_possible_y = vertical_pixels_from_top;
 			let maximum_possible_y = canvas_size.1 - vertical_pixels_from_bottom;
 			// The true length of the axis must be a factor of the resolution so that axis scale markings
 			// accurately line up with plotted points
@@ -290,7 +272,7 @@ pub fn get_xy_axis_pixel_min_max(
 					break 'outer_y_bl;
 				}
 			}
-			((x, maximum_possible_y), (maximum_possible_x, y))
+			((minimum_possible_x, maximum_possible_y), (x, y))
 		}
 	}
 }
@@ -388,8 +370,6 @@ pub fn draw_xy_axes(
 		has_grid,
 		x_axis_resolution,
 	);
-	// x-axis
-	draw_x_axis(canvas, axis_min_pixel, axis_origin_pixel, axis_max_pixel);
 	// y-axis data labels
 	draw_y_axis_scale_markings(
 		quadrants,
@@ -403,6 +383,8 @@ pub fn draw_xy_axes(
 		has_grid,
 		y_axis_resolution,
 	);
+	// x-axis
+	draw_x_axis(canvas, axis_min_pixel, axis_origin_pixel, axis_max_pixel);
 	// y-axis
 	draw_y_axis(canvas, axis_min_pixel, axis_origin_pixel, axis_max_pixel);
 }

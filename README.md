@@ -18,6 +18,7 @@ A CLI app for plotting csv data sets onto a graph. It works by reading a graph d
 * Multiple colours and symbols can be used to plot data sets
 * Data can be sourced from one or more csv files - you're simply targeting certain columns in a given file for extraction
 * Error bars - plot uncertainty in `x` and `y` singly or jointly
+* Appropriate quadrants are drawn if your data makes use of negative `x-y` values
 
 ## Install
 
@@ -248,6 +249,10 @@ Based on the range of values across a given number of data sets the cartesian qu
 Try changing the `x` and `y` axis resolutions to numbers which are a factor of your largest values + 10%. What happens under the hood is that the largest values in your data set are found and slightly scaled so that data points avoid being plotted directly on an axis and thus obscurring some text/markers. When an axis is drawn it has a certain length in pixels and the resolution decides how many times it gets chopped up to display scale markers. To map a data value (f32) to a pixel (u32) there is a conversion where a single pixel represents some amount or length of value data. For an awkward resolution the pixel length between two scale markers could be a long float rather than rounded whole number.
 
 E.g if the largest `x` value in your data is `10` try setting the `x_axis_resolution` to `10 * 1.1 = 11`, that should produce `11` nice scale markers with whole numbers. Likewise a resolution `22` would produce nice markers also as `11` fits into `22` snugly.
+
+### The title/axis labels/legend are blurry
+
+Try increasing the size of your canvas if the edges of the text become blurry.
 
 ## Contributing
 
