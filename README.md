@@ -96,7 +96,7 @@ So to generate a `png` you'd run from within the directory `plotrs -g scatter -c
 
 ## Symbol Types/Colours
 
-The following symbols can be used for plotted data points:
+The following symbols can be used for plotting data points:
 
 * Cross
 * Circle
